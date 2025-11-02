@@ -52,24 +52,27 @@
       body{background:#fff;color:#000}
       .card{box-shadow:none}
     }
-  </style>>
+  </style>
 
 </head>
 <body>
   <div class="wrap">
-    <header>
-      <h1>מחירון והזמנה – אטליז חליסה</h1>
-      <div class="tools">
-        <input id="q" type="search" placeholder="חיפוש מוצר…" />
-        <select id="sort">
-          <option value="name-asc">מיון: א–ת</option>
-          <option value="name-desc">מיון: ת–א</option>
-          <option value="price-asc">מחיר (נמוך → גבוה)</option>
-          <option value="price-desc">מחיר (גבוה → נמוך)</option>
-        </select>
-        <span id="count" class="mini">—</span>
-      </div>
-    </header>
+   <header style="display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap;margin-bottom:8px;">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <img src="Asset 1.webp" alt="Halisa Butchery Logo" style="height:48px;object-fit:contain;filter:drop-shadow(0 0 4px rgba(0,0,0,0.4));">
+    <h1 style="margin:0;font-size:22px;">מחירון והזמנה – אטליז חליסה</h1>
+  </div>
+  <div class="tools">
+    <input id="q" type="search" placeholder="חיפוש מוצר…" />
+    <select id="sort">
+      <option value="name-asc">מיון: א–ת</option>
+      <option value="name-desc">מיון: ת–א</option>
+      <option value="price-asc">מחיר (נמוך → גבוה)</option>
+      <option value="price-desc">מחיר (גבוה → נמוך)</option>
+    </select>
+    <span id="count" class="mini">—</span>
+  </div>
+</header>
 
     <div class="two">
       <div id="cols" class="cols"></div>
