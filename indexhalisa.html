@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>מחירון והזמנה – אטליז חליסה</title>
+<style>
+  :root{
+    --bg:#0f0c0c;              /* רקע כהה עם נגיעת אדום */
+    --paper:#1a1111;           /* רקע קלפים */
+    --ink:#f2f2f2;             /* טקסט */
+    --muted:#9b8d8d;           /* אפור-אדמדם */
+    --line:#2c1b1b;            /* קווי גבול */
+    --accent:#ff6b6b;          /* אדום חם להדגשות */
+    --cta:#b62424;             /* כפתור אדמדם-בורדו */
+    --card:#201414;            /* רקע קלף פנימי */
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:radial-gradient(1200px 800px at 100% -20%, #2a1515, var(--bg));
+    color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+  }
+  button.cta{
+    background:var(--cta);
+    border-color:var(--cta);
+    color:#fff;
+    font-weight:800;
+  }
+  .price{ color:var(--accent); }
+  .chip:hover{ border-color:#b94c4c; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>מחירון והזמנה – אטליז חליסה</h1>
+      <div class="tools">
+        <input id="q" type="search" placeholder="חיפוש מוצר…" />
+        <select id="sort">
+          <option value="name-asc">מיון: א–ת</option>
+          <option value="name-desc">מיון: ת–א</option>
+          <option value="price-asc">מחיר (נמוך → גבוה)</option>
+          <option value="price-desc">מחיר (גבוה → נמוך)</option>
+        </select>
+        <span id="count" class="mini">—</span>
+      </div>
+    </header>
+
+    <div class="two">
+      <div id="cols" class="cols"></div>
+
+      <aside class="cart">
+        <h3>סל קניות</h3>
+        <div class="mini">הוסיפו כמויות → העתקה או שליחת הסל ל־WhatsApp</div>
+        <div id="cartList" class="cart-list"></div>
+
+        <div class="note">
+          המחיר הסופי ייקבע אחרי שקילה בפועל. <br/>
+          המחירון מתעדכן לעיתים קרובות – יש לוודא את תוקפו בעת ההזמנה.
+        </div>
+
+        <!-- הערות לקצב -->
+        <div class="notes">
+          <label for="notesArea">הערות לקצב (למשל: חזה חתוך לקוביות / לשניצלים, נתח שלם, קצוץ וכו’)</label>
+          <textarea id="notesArea" rows="3" placeholder="כתבו כאן כל בקשה מיוחדת לחיתוך/אריזה…"></textarea>
+        </div>
+
+        <div class="actions">
+          <button id="copyBtn">העתקת סל</button>
+          <button id="waBtn" class="cta">שליחה ל־WhatsApp</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    // מספר הוואטסאפ של הסניף השני
+    const WA_BASE = "https://wa.me/972549220234?text=";
+
+    // מחירים לפי הגרסה האחרונה (חזה הודו 45₪, "לוליפופ כבש" הוסר)
+    const DATA = [
+      // עופות
+      {name:"עוף שלם", price:25, category:"עופות"},
+      {name:"כבד עוף", price:30, category:"עופות"},
+      {name:"לבבות", price:35, category:"עופות"},
+      {name:"כרעיים", price:28, category:"עופות"},
+      {name:"חזה עוף", price:40, category:"עופות"},
+      {name:"שניצל", price:45, category:"עופות"},
+      {name:"פילה עוף", price:48, category:"עופות"},
+      {name:"פרגית בלי עור", price:50, category:"עופות"},
+      {name:"פרגית עם עור", price:40, category:"עופות"},
+      {name:"שוקיים", price:30, category:"עופות"},
+      {name:"כנפיים", price:20, category:"עופות"},
+      {name:"חזה הודו", price:45, category:"עופות"},        // עודכן ל-45
+      {name:"כרעיים 4 קילו", price:100, category:"עופות", qtyMode:"none"}, // בלי כמות
+
+      // עגל
+      {name:"בשר טחון", price:66, category:"עגל"},
+      {name:"זנב עגל", price:54, category:"עגל"},
+      {name:"לשון עגל", price:75, category:"עגל"},
+      {name:"שקדי עגל", price:150, category:"עגל"},
+      {name:"נתח קצבים", price:149, category:"עגל"},
+      {name:"בשר ראש", price:79, category:"עגל"},
+      {name:"רגל עגל", price:50, category:"עגל"},
+      {name:"כבד עגל", price:30, category:"עגל"},
+      {name:"מוח עגל ליחידה", price:35, category:"עגל", qtyMode:"unit"}, // ליחידה
+      {name:"כתף מס' 5", price:95, category:"עגל"},
+      {name:"אוסובוקו עגל", price:75, category:"עגל"},
+      {name:"שייטל", price:109, category:"עגל"},
+      {name:"בשר עגלה", price:80, category:"עגל"},
+
+      // סטייקים
+      {name:"צלעות טיבון", price:180, category:"סטייקים"},
+      {name:"צלעות בייבי", price:249, category:"סטייקים"},
+      {name:"דפי אסאדו", price:100, category:"סטייקים"},
+      {name:"דפי אנטריקוט", price:159, category:"סטייקים"},
+      {name:"רצועות ואסיו", price:139, category:"סטייקים"},
+      {name:"פילה שייטל", price:130, category:"סטייקים"},
+      {name:"אנטריקוט עגל", price:160, category:"סטייקים"},
+      {name:"פילה עגל", price:200, category:"סטייקים"},
+      {name:"סינטה", price:150, category:"סטייקים"},
+      {name:"פיקנייה", price:129, category:"סטייקים"},
+      {name:"אנטריקוט בלאק אנגוס", price:230, category:"סטייקים"},
+      {name:"טיבון בלאק אנגוס", price:180, category:"סטייקים"},
+      {name:"טומהוק", price:180, category:"סטייקים"},
+
+      // כבש
+      {name:"כבש בלי עצם", price:180, category:"כבש"},
+      {name:"כבש עם עצם", price:129, category:"כבש"},
+      {name:"לייה בלדי", price:120, category:"כבש"},
+      {name:"שוק כבש", price:129, category:"כבש"},
+      {name:"כבד כבש", price:50, category:"כבש"},
+      {name:"שיפודי כבש", price:180, category:"כבש"},
+      {name:"אוסובוקו כבש", price:130, category:"כבש"},
+      {name:"צוור כבש", price:129, category:"כבש"},
+      {name:"כתף כבש", price:129, category:"כבש"},
+
+      // מיוחדים
+      {name:"עראיס", price:69, category:"מיוחדים"},
+      {name:"המבורגר", price:75, category:"מיוחדים"},
+      {name:"קבב", price:75, category:"מיוחדים"},
+      {name:"סרסיסו", price:75, category:"מיוחדים"},
+      {name:"לוליפופ", price:180, category:"מיוחדים"},
+      {name:"מרגז חריף", price:75, category:"מיוחדים"},
+      /* {name:"לוליפופ כבש", price:89, category:"מיוחדים"}, הוסר לפי בקשתך */
+      {name:"כנפיים מתובל", price:25, category:"מיוחדים"},
+      {name:"עוף ממולה", price:49, category:"מיוחדים"},
+      {name:"כבש ממולאים", price:139, category:"מיוחדים"},
+      {name:"עגל ממולה", price:139, category:"מיוחדים"},
+      {name:"שיפדי פרגית", price:69, category:"מיוחדים"},
+      {name:"שיפודי לבבות", price:69, category:"מיוחדים"},
+
+      // שווארמה
+      {name:"עגל (שווארמה)", price:85, category:"שווארמה"},
+      {name:"הודו נקבה", price:70, category:"שווארמה"},
+      {name:"עוף (שווארמה)", price:45, category:"שווארמה"},
+      {name:"שווארמה פרגית", price:50, category:"שווארמה"},
+      {name:"כבש (שווארמה)", price:180, category:"שווארמה"}
+    ];
+    const desiredOrder = ["עופות","עגל","סטייקים","כבש","מיוחדים","שווארמה"];
+
+    // אלמנטים
+    const cols = document.getElementById('cols');
+    const q = document.getElementById('q');
+    const sortSel = document.getElementById('sort');
+    const countEl = document.getElementById('count');
+    const cartList = document.getElementById('cartList');
+    const copyBtn = document.getElementById('copyBtn');
+    const waBtn = document.getElementById('waBtn');
+    const notesArea = document.getElementById('notesArea');
+
+    // סל
+    const cart = new Map();
+    const keyOf = i => `${i.name}|${i.category}`;
+    function addToCart(item, qty){
+      const k = keyOf(item);
+      if(!cart.has(k)) cart.set(k, {...item, qty:0});
+      cart.get(k).qty = Math.max(0, (Number(cart.get(k).qty)||0) + qty);
+      if(cart.get(k).qty === 0) cart.delete(k);
+      renderCart();
+    }
+    function removeItem(item){ cart.delete(keyOf(item)); renderCart(); }
+    const money = n => `₪ ${Number(n||0).toLocaleString('he-IL',{maximumFractionDigits:2})}`;
+
+    function renderCart(){
+      cartList.innerHTML = '';
+      Array.from(cart.values()).forEach(it=>{
+        const line = document.createElement('div'); line.className='line';
+        const left = document.createElement('div');
+        left.innerHTML = `<div><strong>${it.name}</strong> <span class="mini">(${it.category})</span></div>
+                          <div class="mini">${money(it.price)} × ${it.qty}</div>`;
+        const priceEl = document.createElement('div'); priceEl.className='mini'; priceEl.textContent = money(it.price * it.qty);
+        const del = document.createElement('button'); del.className='del'; del.textContent='מחק';
+        del.addEventListener('click', ()=> removeItem(it));
+        line.append(left, priceEl, del);
+        cartList.append(line);
+      });
+    }
+
+    function buildText(){
+      const lines = [];
+      lines.push("הזמנה לאטליז חליסה:");
+      Array.from(cart.values()).forEach(it=>{
+        lines.push(`• ${it.category} | ${it.name} × ${it.qty} — ${money(it.price * it.qty)}`);
+      });
+      const notes = (notesArea.value||"").trim();
+      if(notes){
+        lines.push("");
+        lines.push("הערות לקצב:");
+        lines.push(notes);
+      }
+      lines.push("");
+      lines.push("הערה: המחיר הסופי ייקבע אחרי שקילה בפועל. המחירון מתעדכן; יש לוודא תוקף בעת ההזמנה.");
+      return lines.join("\n");
+    }
+
+    copyBtn.addEventListener('click', ()=>{
+      navigator.clipboard.writeText(buildText()).then(()=>{
+        copyBtn.textContent="הועתק ✓";
+        setTimeout(()=>copyBtn.textContent="העתקת סל",900);
+      });
+    });
+    waBtn.addEventListener('click', ()=>{
+      window.open(WA_BASE + encodeURIComponent(buildText()), "_blank");
+    });
+
+    // עזר
+    function groupByCategory(rows){
+      const m = new Map();
+      rows.forEach(x=>{
+        const c = x.category || "אחר";
+        if(!m.has(c)) m.set(c, []);
+        m.get(c).push(x);
+      });
+      return m;
+    }
+
+    function apply(){
+      const term = (q.value||"").trim();
+      const s = sortSel.value;
+      let rows = DATA.filter(x => !term || (x.name && x.name.includes(term)));
+      const cmp = (a,b)=>{
+        if (s==='name-asc')  return (a.name||'').localeCompare(b.name||'','he');
+        if (s==='name-desc') return (b.name||'').localeCompare(a.name||'','he');
+        if (s==='price-asc') return (a.price??Infinity) - (b.price??Infinity);
+        if (s==='price-desc')return (b.price??-Infinity) - (a.price??-Infinity);
+        return 0;
+      };
+      render(rows, cmp);
+    }
+
+    function render(rows, cmp){
+      countEl.textContent = `${rows.length.toLocaleString('he-IL')} פריטים`;
+      const by = groupByCategory(rows);
+      const rest = Array.from(by.keys()).filter(c=>!desiredOrder.includes(c)).sort((a,b)=>a.localeCompare(b,'he'));
+      const order = [...desiredOrder.filter(c=>by.has(c)), ...rest];
+
+      cols.innerHTML = '';
+      order.forEach(cat=>{
+        const section = document.createElement('section');
+        section.className = 'cat';
+        const h2 = document.createElement('h2'); h2.textContent = cat; section.appendChild(h2);
+
+        const list = document.createElement('div'); list.className='list';
+        by.get(cat).slice().sort(cmp).forEach(item=>{
+          const card = document.createElement('div'); card.className='card';
+
+          const top = document.createElement('div'); top.className='row';
+          const name = document.createElement('div'); name.className='name'; name.textContent = item.name;
+          const right = document.createElement('div'); right.style.display='flex'; right.style.alignItems='center';
+          const price = document.createElement('div'); price.className='price'; price.textContent = money(item.price);
+          right.appendChild(price);
+          if(item.qtyMode === 'unit'){
+            const unit = document.createElement('span'); unit.className='unit'; unit.textContent = 'ליחידה';
+            right.appendChild(unit);
+          }
+          top.append(name, right);
+
+          const qty = document.createElement('div'); qty.className='qty';
+
+          if(item.qtyMode === 'none'){
+            const add = document.createElement('button'); add.textContent='הוסף'; add.className='add';
+            add.addEventListener('click', ()=> addToCart(item, 1));
+            qty.appendChild(add);
+          } else {
+            const step = (item.qtyMode === 'unit') ? 1 : 0.5;
+            const minus = document.createElement('button'); minus.className='btn'; minus.textContent='–';
+            const input = document.createElement('input'); input.type='number'; input.min='0'; input.step=String(step); input.value='0';
+            const plus  = document.createElement('button'); plus.className='btn'; plus.textContent='+';
+            const add   = document.createElement('button'); add.textContent='הוסף'; add.className='add btn';
+
+            const setVal = v => input.value = (Math.max(0, v)).toString().replace(/\.0$/,'');
+            const stepUp = ()=> setVal((parseFloat(input.value)||0) + step);
+            const stepDn = ()=> setVal(Math.max(0, (parseFloat(input.value)||0) - step));
+
+            minus.addEventListener('click', stepDn);
+            plus.addEventListener('click', stepUp);
+            add.addEventListener('click', ()=>{
+              const n = Math.max(0, parseFloat(input.value||'0'));
+              if(n>0) addToCart(item, n);
+              setVal(0);
+            });
+
+            qty.append(minus, input, plus, add);
+
+            const chips = document.createElement('div'); chips.className='chips';
+            const chipVals = (item.qtyMode === 'unit') ? [1,2,3,4,5] : [0.5,1,1.5,2,2.5,3,4,5];
+            chipVals.forEach(v=>{
+              const chip = document.createElement('button');
+              chip.className = 'chip';
+              chip.textContent = (item.qtyMode === 'unit') ? `${v} יח׳` : `${v} ק״ג`;
+              chip.addEventListener('click', ()=> setVal(v));
+              chips.appendChild(chip);
+            });
+            card.appendChild(chips);
+          }
+
+          card.append(top, qty);
+          list.appendChild(card);
+        });
+
+        section.appendChild(list);
+        cols.appendChild(section);
+      });
+    }
+
+    apply();
+    q.addEventListener('input', apply);
+    sortSel.addEventListener('change', apply);
+  </script>
+</body>
+</html>
