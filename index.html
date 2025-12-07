@@ -151,6 +151,21 @@
       body{background:#fff;color:#000}
       .card{box-shadow:none}
     }
+  /* כשהקטגוריה פתוחה – להקטין תמונה */
+    .cat:not(.collapsed) .cat-img{
+      height:70px !important;
+      margin-bottom:4px !important;
+      opacity:0.9;
+      transition:0.3s;
+    }
+
+    /* כשהקטגוריה סגורה – תמונה מלאה */
+    .cat.collapsed .cat-img{
+      height:200px !important;
+      margin-bottom:8px !important;
+      opacity:1;
+      transition:0.3s;
+    }
   </style>
 </head>
 <body>
@@ -416,7 +431,8 @@
         const h2 = document.createElement('h2');
         const iconName = ICONS[cat] || null;
         h2.innerHTML = iconName
-          ? `<img src="${iconName}" style="height:200px;width:100%;object-fit:cover;border-radius:12px;display:block;margin-bottom:8px;object-fit:cover;border-radius:4px;margin-inline-start:6px;vertical-align:middle;"> ${cat}`
+          ? `<img class=\"cat-img\" src=\"${iconName}\" style=\"height:200px;width:100%;object-fit:cover;border-radius:12px;display:block;margin-bottom:8px;transition:0.3s;\"> ${cat}`
+          : cat;width:100%;object-fit:cover;border-radius:12px;display:block;margin-bottom:8px;object-fit:cover;border-radius:4px;margin-inline-start:6px;vertical-align:middle;"> ${cat}`
           : cat;
         section.appendChild(h2);
 
