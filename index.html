@@ -56,7 +56,10 @@
       position:sticky;
       top:0;
       z-index:1;
-      cursor:pointer; /* שיהיה ברור שזה לחיץ */
+      cursor:pointer;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
     }
 
     /* אקורדיון – חץ ופתיחה/סגירה */
@@ -65,6 +68,7 @@
       font-size:12px;
       margin-inline-start:8px;
       opacity:.7;
+      align-self:flex-start;
     }
     .cat.collapsed h2::after{
       content:"▶";
@@ -151,7 +155,8 @@
       body{background:#fff;color:#000}
       .card{box-shadow:none}
     }
-  /* כשהקטגוריה פתוחה – להקטין תמונה */
+
+    /* כשהקטגוריה פתוחה – להקטין תמונה */
     .cat:not(.collapsed) .cat-img{
       height:70px !important;
       margin-bottom:4px !important;
@@ -232,8 +237,8 @@
       {name:"פרגית עם עור", price:40, category:"עופות"},
       {name:"שוקיים", price:30, category:"עופות"},
       {name:"כנפיים", price:20, category:"עופות"},
-      {name:"חזה הודו", price:45, category:"עופות"},        // עודכן ל-45
-      {name:"כרעיים 4 קילו", price:100, category:"עופות", qtyMode:"none"}, // בלי כמות
+      {name:"חזה הודו", price:45, category:"עופות"},
+      {name:"כרעיים 4 קילו", price:100, category:"עופות", qtyMode:"none"},
 
       // עגל
       {name:"בשר טחון", price:66, category:"עגל"},
@@ -244,7 +249,7 @@
       {name:"בשר ראש", price:79, category:"עגל"},
       {name:"רגל עגל", price:50, category:"עגל"},
       {name:"כבד עגל", price:30, category:"עגל"},
-      {name:"מוח עגל ליחידה", price:35, category:"עגל", qtyMode:"unit"}, // ליחידה
+      {name:"מוח עגל ליחידה", price:35, category:"עגל", qtyMode:"unit"},
       {name:"כתף מס' 5", price:95, category:"עגל"},
       {name:"אוסובוקו עגל", price:75, category:"עגל"},
       {name:"שייטל", price:109, category:"עגל"},
@@ -283,7 +288,6 @@
       {name:"סרסיסו", price:75, category:"מיוחדים"},
       {name:"לוליפופ", price:180, category:"מיוחדים"},
       {name:"מרגז חריף", price:75, category:"מיוחדים"},
-      /* {name:"לוליפופ כבש", price:89, category:"מיוחדים"}, הוסר לפי בקשתך */
       {name:"כנפיים מתובל", price:25, category:"מיוחדים"},
       {name:"עוף ממולה", price:49, category:"מיוחדים"},
       {name:"כבש ממולאים", price:139, category:"מיוחדים"},
@@ -426,14 +430,21 @@
       cols.innerHTML = '';
       order.forEach(cat=>{
         const section = document.createElement('section');
-        section.className = 'cat collapsed'; // סגור כברירת מחדל // מתחיל פתוח, אפשר לסגור בלחיצה
+        section.className = 'cat collapsed'; // סגור כברירת מחדל
 
         const h2 = document.createElement('h2');
         const iconName = ICONS[cat] || null;
-        h2.innerHTML = iconName
-          ? `<img class=\"cat-img\" src=\"${iconName}\" style=\"height:200px;width:100%;object-fit:cover;border-radius:12px;display:block;margin-bottom:8px;transition:0.3s;\"> ${cat}`
-          : cat;width:100%;object-fit:cover;border-radius:12px;display:block;margin-bottom:8px;object-fit:cover;border-radius:4px;margin-inline-start:6px;vertical-align:middle;"> ${cat}`
-          : cat;
+
+        if(iconName){
+          h2.innerHTML = `
+            <img class="cat-img" src="${iconName}"
+                 style="height:200px;width:100%;object-fit:cover;border-radius:12px;display:block;margin-bottom:8px;transition:0.3s;" />
+            <span>${cat}</span>
+          `;
+        } else {
+          h2.textContent = cat;
+        }
+
         section.appendChild(h2);
 
         const list = document.createElement('div');
