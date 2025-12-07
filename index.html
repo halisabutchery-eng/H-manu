@@ -4,25 +4,85 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>מחירון והזמנה – אטליז חליסה</title>
- <style>
+  <style>
     :root{
       --bg:#150f0f; --paper:#221616; --ink:#e8ecf1; --muted:#8b93a7; --line:#3a2525; --accent:#ffd166; --cta:#3ccf91;
       --card:#211717; --radius:14px;
     }
     *{box-sizing:border-box}
-    body{margin:0;background:radial-gradient(1200px 800px at 100% -20%, #301d1d, var(--bg));color:var(--ink);
-      font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial}
+    body{
+      margin:0;
+      background:radial-gradient(1200px 800px at 100% -20%, #301d1d, var(--bg));
+      color:var(--ink);
+      font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+    }
     .wrap{max-width:1100px;margin:0 auto;padding:16px}
+
     header{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:8px}
     h1{margin:0;font-size:22px}
     .tools{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
-    input,select,button,textarea{background:var(--paper);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:10px 12px;font-size:14px;outline:none}
+
+    input,select,button,textarea{
+      background:var(--paper);
+      border:1px solid var(--line);
+      color:var(--ink);
+      border-radius:10px;
+      padding:10px 12px;
+      font-size:14px;
+      outline:none;
+    }
     textarea{resize:vertical}
-    .cols{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));align-items:start}
-    .cat{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);display:flex;flex-direction:column}
-    .cat h2{margin:0;padding:12px 14px;font-size:18px;background:#241414;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:1}
+
+    .cols{
+      display:grid;
+      gap:14px;
+      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+      align-items:start;
+    }
+
+    .cat{
+      background:var(--paper);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      display:flex;
+      flex-direction:column;
+    }
+    .cat h2{
+      margin:0;
+      padding:12px 14px;
+      font-size:18px;
+      background:#241414;
+      border-bottom:1px solid var(--line);
+      position:sticky;
+      top:0;
+      z-index:1;
+      cursor:pointer; /* שיהיה ברור שזה לחיץ */
+    }
+
+    /* אקורדיון – חץ ופתיחה/סגירה */
+    .cat h2::after{
+      content:"▼";
+      font-size:12px;
+      margin-inline-start:8px;
+      opacity:.7;
+    }
+    .cat.collapsed h2::after{
+      content:"▶";
+    }
+    .cat.collapsed .list{
+      display:none;
+    }
+
     .list{padding:10px}
-    .card{background:linear-gradient(180deg,var(--card),#241414);border:1px solid #382222;border-radius:12px;padding:10px;margin-bottom:10px;box-shadow:0 3px 12px rgba(0,0,0,.25)}
+
+    .card{
+      background:linear-gradient(180deg,var(--card),#241414);
+      border:1px solid #382222;
+      border-radius:12px;
+      padding:10px;
+      margin-bottom:10px;
+      box-shadow:0 3px 12px rgba(0,0,0,.25);
+    }
     .row{display:flex;gap:8px;align-items:center;justify-content:space-between}
     .name{font-weight:700}
     .price{font-weight:800;color:var(--accent)}
@@ -32,47 +92,85 @@
     .qty input{width:64px;text-align:center}
     .qty .add{margin-inline-start:auto;border-color:#502f2f}
     .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
-    .chip{font-size:12px;padding:6px 8px;border:1px dashed var(--line);border-radius:999px;color:var(--muted);cursor:pointer;background:transparent}
+    .chip{
+      font-size:12px;
+      padding:6px 8px;
+      border:1px dashed var(--line);
+      border-radius:999px;
+      color:var(--muted);
+      cursor:pointer;
+      background:transparent;
+    }
     .chip:hover{border-color:#3a425a}
-    .cart{position:sticky;top:10px;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:12px;min-width:260px}
+
+    .cart{
+      position:sticky;
+      top:10px;
+      background:var(--paper);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px;
+      min-width:260px;
+    }
     .cart h3{margin:0 0 8px 0}
     .cart-list{display:grid;gap:8px;margin:8px 0;max-height:38vh;overflow:auto}
     .mini{font-size:12px;color:var(--muted)}
     .line{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center}
-    .del{background:transparent;border:1px dashed var(--line);padding:6px 8px;border-radius:8px;color:var(--muted);font-size:12px;cursor:pointer}
-    .note{margin-top:10px;padding:10px;border:1px dashed var(--line);border-radius:10px;color:var(--muted);font-size:13px;line-height:1.5}
+    .del{
+      background:transparent;
+      border:1px dashed var(--line);
+      padding:6px 8px;
+      border-radius:8px;
+      color:var(--muted);
+      font-size:12px;
+      cursor:pointer;
+    }
+
+    .note{
+      margin-top:10px;
+      padding:10px;
+      border:1px dashed var(--line);
+      border-radius:10px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+    }
     .notes{margin-top:10px;display:flex;flex-direction:column;gap:6px}
     .notes label{font-size:13px;color:var(--muted)}
     .cta{background:var(--cta);border-color:var(--cta);color:#250606;font-weight:800}
     .actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+
     .two{display:grid;grid-template-columns:1fr 320px;gap:14px}
-    @media (max-width:900px){.two{grid-template-columns:1fr}.cart{position:static}}
+    @media (max-width:900px){
+      .two{grid-template-columns:1fr}
+      .cart{position:static}
+    }
+
     @media print{
       .tools, .cta, #copyBtn, #waBtn, #notesArea {display:none}
       body{background:#fff;color:#000}
       .card{box-shadow:none}
     }
   </style>
-
 </head>
 <body>
   <div class="wrap">
-   <header style="display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap;margin-bottom:8px;">
-  <div style="display:flex;align-items:center;gap:10px;">
-    <img src="Asset 1.webp" alt="Halisa Butchery Logo" style="height:48px;object-fit:contain;filter:drop-shadow(0 0 4px rgba(0,0,0,0.4));">
-    <h1 style="margin:0;font-size:22px;">מחירון והזמנה – אטליז חליסה</h1>
-  </div>
-  <div class="tools">
-    <input id="q" type="search" placeholder="חיפוש מוצר…" />
-    <select id="sort">
-      <option value="name-asc">מיון: א–ת</option>
-      <option value="name-desc">מיון: ת–א</option>
-      <option value="price-asc">מחיר (נמוך → גבוה)</option>
-      <option value="price-desc">מחיר (גבוה → נמוך)</option>
-    </select>
-    <span id="count" class="mini">—</span>
-  </div>
-</header>
+    <header style="display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap;margin-bottom:8px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <img src="Asset 1.webp" alt="Halisa Butchery Logo" style="height:48px;object-fit:contain;filter:drop-shadow(0 0 4px rgba(0,0,0,0.4));">
+        <h1 style="margin:0;font-size:22px;">מחירון והזמנה – אטליז חליסה</h1>
+      </div>
+      <div class="tools">
+        <input id="q" type="search" placeholder="חיפוש מוצר…" />
+        <select id="sort">
+          <option value="name-asc">מיון: א–ת</option>
+          <option value="name-desc">מיון: ת–א</option>
+          <option value="price-asc">מחיר (נמוך → גבוה)</option>
+          <option value="price-desc">מחיר (גבוה → נמוך)</option>
+        </select>
+        <span id="count" class="mini">—</span>
+      </div>
+    </header>
 
     <div class="two">
       <div id="cols" class="cols"></div>
@@ -102,7 +200,7 @@
   </div>
 
   <script>
-    // מספר הוואטסאפ של הסניף השני
+    // מספר הוואטסאפ של הסניף הזה
     const WA_BASE = "https://wa.me/972549220234?text=";
 
     // מחירים לפי הגרסה האחרונה (חזה הודו 45₪, "לוליפופ כבש" הוסר)
@@ -185,6 +283,17 @@
       {name:"שווארמה פרגית", price:50, category:"שווארמה"},
       {name:"כבש (שווארמה)", price:180, category:"שווארמה"}
     ];
+
+    // מפה של אייקונים לקטגוריות
+    const ICONS = {
+      "עופות": "Chicken.png",
+      "עגל": "Veal.png",
+      "סטייקים": "Steaks.png",
+      "כבש": "Lamb.png",
+      "מיוחדים": "Specials.png",
+      "שווארמה": "Shawarma.png"
+    };
+
     const desiredOrder = ["עופות","עגל","סטייקים","כבש","מיוחדים","שווארמה"];
 
     // אלמנטים
@@ -207,19 +316,32 @@
       if(cart.get(k).qty === 0) cart.delete(k);
       renderCart();
     }
-    function removeItem(item){ cart.delete(keyOf(item)); renderCart(); }
+    function removeItem(item){
+      cart.delete(keyOf(item));
+      renderCart();
+    }
     const money = n => `₪ ${Number(n||0).toLocaleString('he-IL',{maximumFractionDigits:2})}`;
 
     function renderCart(){
       cartList.innerHTML = '';
       Array.from(cart.values()).forEach(it=>{
-        const line = document.createElement('div'); line.className='line';
+        const line = document.createElement('div');
+        line.className='line';
+
         const left = document.createElement('div');
-        left.innerHTML = `<div><strong>${it.name}</strong> <span class="mini">(${it.category})</span></div>
-                          <div class="mini">${money(it.price)} × ${it.qty}</div>`;
-        const priceEl = document.createElement('div'); priceEl.className='mini'; priceEl.textContent = money(it.price * it.qty);
-        const del = document.createElement('button'); del.className='del'; del.textContent='מחק';
+        left.innerHTML =
+          `<div><strong>${it.name}</strong> <span class="mini">(${it.category})</span></div>
+           <div class="mini">${money(it.price)} × ${it.qty}</div>`;
+
+        const priceEl = document.createElement('div');
+        priceEl.className='mini';
+        priceEl.textContent = money(it.price * it.qty);
+
+        const del = document.createElement('button');
+        del.className='del';
+        del.textContent='מחק';
         del.addEventListener('click', ()=> removeItem(it));
+
         line.append(left, priceEl, del);
         cartList.append(line);
       });
@@ -248,6 +370,7 @@
         setTimeout(()=>copyBtn.textContent="העתקת סל",900);
       });
     });
+
     waBtn.addEventListener('click', ()=>{
       window.open(WA_BASE + encodeURIComponent(buildText()), "_blank");
     });
@@ -280,34 +403,62 @@
     function render(rows, cmp){
       countEl.textContent = `${rows.length.toLocaleString('he-IL')} פריטים`;
       const by = groupByCategory(rows);
-      const rest = Array.from(by.keys()).filter(c=>!desiredOrder.includes(c)).sort((a,b)=>a.localeCompare(b,'he'));
+      const rest = Array.from(by.keys())
+        .filter(c=>!desiredOrder.includes(c))
+        .sort((a,b)=>a.localeCompare(b,'he'));
       const order = [...desiredOrder.filter(c=>by.has(c)), ...rest];
 
       cols.innerHTML = '';
       order.forEach(cat=>{
         const section = document.createElement('section');
-        section.className = 'cat';
-        const h2 = document.createElement('h2'); h2.textContent = cat; section.appendChild(h2);
+        section.className = 'cat collapsed'; // סגור כברירת מחדל // מתחיל פתוח, אפשר לסגור בלחיצה
 
-        const list = document.createElement('div'); list.className='list';
+        const h2 = document.createElement('h2');
+        const iconName = ICONS[cat] || null;
+        h2.innerHTML = iconName
+          ? `<img src="${iconName}" style="height:22px;width:22px;object-fit:cover;border-radius:4px;margin-inline-start:6px;vertical-align:middle;"> ${cat}`
+          : cat;
+        section.appendChild(h2);
+
+        const list = document.createElement('div');
+        list.className='list';
+
         by.get(cat).slice().sort(cmp).forEach(item=>{
-          const card = document.createElement('div'); card.className='card';
+          const card = document.createElement('div');
+          card.className='card';
 
-          const top = document.createElement('div'); top.className='row';
-          const name = document.createElement('div'); name.className='name'; name.textContent = item.name;
-          const right = document.createElement('div'); right.style.display='flex'; right.style.alignItems='center';
-          const price = document.createElement('div'); price.className='price'; price.textContent = money(item.price);
+          const top = document.createElement('div');
+          top.className='row';
+
+          const name = document.createElement('div');
+          name.className='name';
+          name.textContent = item.name;
+
+          const right = document.createElement('div');
+          right.style.display='flex';
+          right.style.alignItems='center';
+
+          const price = document.createElement('div');
+          price.className='price';
+          price.textContent = money(item.price);
           right.appendChild(price);
+
           if(item.qtyMode === 'unit'){
-            const unit = document.createElement('span'); unit.className='unit'; unit.textContent = 'ליחידה';
+            const unit = document.createElement('span');
+            unit.className='unit';
+            unit.textContent = 'ליחידה';
             right.appendChild(unit);
           }
+
           top.append(name, right);
 
-          const qty = document.createElement('div'); qty.className='qty';
+          const qty = document.createElement('div');
+          qty.className='qty';
 
           if(item.qtyMode === 'none'){
-            const add = document.createElement('button'); add.textContent='הוסף'; add.className='add';
+            const add = document.createElement('button');
+            add.textContent='הוסף';
+            add.className='add';
             add.addEventListener('click', ()=> addToCart(item, 1));
             qty.appendChild(add);
           } else {
@@ -323,6 +474,7 @@
 
             minus.addEventListener('click', stepDn);
             plus.addEventListener('click', stepUp);
+
             add.addEventListener('click', ()=>{
               const n = Math.max(0, parseFloat(input.value||'0'));
               if(n>0) addToCart(item, n);
@@ -331,8 +483,12 @@
 
             qty.append(minus, input, plus, add);
 
-            const chips = document.createElement('div'); chips.className='chips';
-            const chipVals = (item.qtyMode === 'unit') ? [1,2,3,4,5] : [0.5,1,1.5,2,2.5,3,4,5];
+            const chips = document.createElement('div');
+            chips.className='chips';
+            const chipVals = (item.qtyMode === 'unit')
+              ? [1,2,3,4,5]
+              : [0.5,1,1.5,2,2.5,3,4,5];
+
             chipVals.forEach(v=>{
               const chip = document.createElement('button');
               chip.className = 'chip';
@@ -340,6 +496,7 @@
               chip.addEventListener('click', ()=> setVal(v));
               chips.appendChild(chip);
             });
+
             card.appendChild(chips);
           }
 
@@ -349,6 +506,11 @@
 
         section.appendChild(list);
         cols.appendChild(section);
+
+        // פתיחה/סגירה בלחיצה
+        h2.addEventListener('click', ()=>{
+          section.classList.toggle('collapsed');
+        });
       });
     }
 
