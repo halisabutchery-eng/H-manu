@@ -156,12 +156,15 @@
       .card{box-shadow:none}
     }
 
-    /* כשהקטגוריה פתוחה – להקטין תמונה */
+    /* כשהקטגוריה פתוחה – להעלים תמונה */
     .cat:not(.collapsed) .cat-img{
-      height:70px !important;
-      margin-bottom:4px !important;
-      opacity:0.9;
+      height:0 !important;
+      margin:0 !important;
+      opacity:0;
+      padding:0 !important;
+      overflow:hidden;
       transition:0.3s;
+    }
     }
 
     /* כשהקטגוריה סגורה – תמונה מלאה */
