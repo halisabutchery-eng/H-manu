@@ -547,6 +547,11 @@
     apply();
     q.addEventListener('input', apply);
     sortSel.addEventListener('change', apply);
-  </script>
+    
+  gtag('event', 'click_wa_button', {
+    'event_category': 'engagement',
+    'event_label': 'WhatsApp Send Button'
+  });
+</script>
 </body>
 </html>
