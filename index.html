@@ -4,6 +4,16 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>מחירון והזמנה – אטליז חליסה</title>
+
+  <!-- Google tag (gtag.js) – GA4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-LJ5QVNL81Q"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-LJ5QVNL81Q');
+  </script>
+
   <style>
     :root{
       --bg:#150f0f; --paper:#221616; --ink:#e8ecf1; --muted:#8b93a7; --line:#3a2525; --accent:#ffd166; --cta:#3ccf91;
@@ -164,7 +174,6 @@
       padding:0 !important;
       overflow:hidden;
       transition:0.3s;
-    }
     }
 
     /* כשהקטגוריה סגורה – תמונה מלאה */
@@ -386,14 +395,28 @@
       return lines.join("\n");
     }
 
+    // העתקת סל + אירוע GA
     copyBtn.addEventListener('click', ()=>{
       navigator.clipboard.writeText(buildText()).then(()=>{
         copyBtn.textContent="הועתק ✓";
         setTimeout(()=>copyBtn.textContent="העתקת סל",900);
       });
+      if(typeof gtag === 'function'){
+        gtag('event', 'copy_cart', {
+          event_category: 'engagement',
+          event_label: 'Cart Copied'
+        });
+      }
     });
 
+    // שליחת סל לוואטסאפ + אירוע GA
     waBtn.addEventListener('click', ()=>{
+      if(typeof gtag === 'function'){
+        gtag('event', 'click_whatsapp', {
+          event_category: 'engagement',
+          event_label: 'WhatsApp Send'
+        });
+      }
       window.open(WA_BASE + encodeURIComponent(buildText()), "_blank");
     });
 
@@ -537,21 +560,33 @@
         section.appendChild(list);
         cols.appendChild(section);
 
-        // פתיחה/סגירה בלחיצה
+        // פתיחה/סגירה בלחיצה + אירוע GA
         h2.addEventListener('click', ()=>{
           section.classList.toggle('collapsed');
+          if(typeof gtag === 'function'){
+            gtag('event', 'toggle_category', {
+              event_category: 'navigation',
+              event_label: cat
+            });
+          }
         });
       });
     }
 
     apply();
-    q.addEventListener('input', apply);
+
+    // חיפוש + אירוע GA
+    q.addEventListener('input', ()=>{
+      apply();
+      if(typeof gtag === 'function' && q.value.trim()){
+        gtag('event', 'search', {
+          event_category: 'interaction',
+          event_label: q.value.trim()
+        });
+      }
+    });
+
     sortSel.addEventListener('change', apply);
-    
-  gtag('event', 'click_wa_button', {
-    'event_category': 'engagement',
-    'event_label': 'WhatsApp Send Button'
-  });
-</script>
+  </script>
 </body>
 </html>
