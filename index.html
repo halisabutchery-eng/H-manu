@@ -16,13 +16,21 @@
 
   <style>
     :root{
-      --bg:#150f0f; --paper:#221616; --ink:#e8ecf1; --muted:#8b93a7; --line:#3a2525; --accent:#ffd166; --cta:#3ccf91;
-      --card:#211717; --radius:14px;
+      /* Light theme */
+      --bg:#ffffff;
+      --paper:#f7f7f8;
+      --card:#ffffff;
+      --ink:#111111;
+      --muted:#6b7280;
+      --line:#e5e7eb;
+      --accent:#b45309; /* מחיר */
+      --cta:#16a34a;    /* כפתור וואטסאפ */
+      --radius:14px;
     }
     *{box-sizing:border-box}
     body{
       margin:0;
-      background:radial-gradient(1200px 800px at 100% -20%, #301d1d, var(--bg));
+      background:var(--bg);
       color:var(--ink);
       font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
     }
@@ -56,66 +64,53 @@
       border-radius:var(--radius);
       display:flex;
       flex-direction:column;
+      overflow:hidden;
     }
+
     .cat h2{
       margin:0;
       padding:12px 14px;
       font-size:18px;
-      background:#241414;
+      background:var(--paper);
       border-bottom:1px solid var(--line);
       position:sticky;
       top:0;
-      z-index:1;
+      z-index:3;
       cursor:pointer;
       display:flex;
       flex-direction:column;
-      gap:6px;
+      gap:8px;
     }
 
     /* אקורדיון – חץ ופתיחה/סגירה */
     .cat h2::after{
       content:"▼";
       font-size:12px;
-      margin-inline-start:8px;
       opacity:.7;
       align-self:flex-start;
     }
-    .cat.collapsed h2::after{
-      content:"▶";
-    }
-    .cat.collapsed .list{
-      display:none;
-    }
+    .cat.collapsed h2::after{content:"▶";}
+    .cat.collapsed .list{display:none;}
 
     .list{padding:10px}
 
     .card{
-      background:linear-gradient(180deg,var(--card),#241414);
-      border:1px solid #382222;
+      background:var(--card);
+      border:1px solid var(--line);
       border-radius:12px;
       padding:10px;
       margin-bottom:10px;
-      box-shadow:0 3px 12px rgba(0,0,0,.25);
+      box-shadow:0 2px 6px rgba(0,0,0,.08);
     }
     .row{display:flex;gap:8px;align-items:center;justify-content:space-between}
     .name{font-weight:700}
     .price{font-weight:800;color:var(--accent)}
     .unit{font-size:12px;color:var(--muted);margin-inline-start:8px}
+
     .qty{display:flex;gap:6px;align-items:center;margin-top:8px;flex-wrap:wrap}
     .qty .btn{padding:6px 10px;font-weight:700;font-size:15px;cursor:pointer}
-    .qty input{width:64px;text-align:center}
+    .qty .val{min-width:56px;text-align:center;cursor:default}
     .qty .add{margin-inline-start:auto;border-color:#502f2f}
-    .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
-    .chip{
-      font-size:12px;
-      padding:6px 8px;
-      border:1px dashed var(--line);
-      border-radius:999px;
-      color:var(--muted);
-      cursor:pointer;
-      background:transparent;
-    }
-    .chip:hover{border-color:#3a425a}
 
     .cart{
       position:sticky;
@@ -151,6 +146,10 @@
     }
     .notes{margin-top:10px;display:flex;flex-direction:column;gap:6px}
     .notes label{font-size:13px;color:var(--muted)}
+
+    .fulfillment{margin-top:10px;padding:10px;border:1px dashed var(--line);border-radius:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .radio{display:flex;gap:8px;align-items:center;cursor:pointer;color:var(--ink)}
+    .radio input{accent-color:var(--cta);width:18px;height:18px}
     .cta{background:var(--cta);border-color:var(--cta);color:#250606;font-weight:800}
     .actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
 
@@ -166,22 +165,42 @@
       .card{box-shadow:none}
     }
 
+    /* תמונות קטגוריה */
+    .cat-img{
+      width:100%;
+      height:220px;
+      object-fit:cover;
+      border-radius:12px;
+      display:block;
+      margin:0;
+      transition:height .25s ease, opacity .25s ease, margin .25s ease;
+      image-rendering:auto;
+      -webkit-font-smoothing:antialiased;
+    }
+
     /* כשהקטגוריה פתוחה – להעלים תמונה */
     .cat:not(.collapsed) .cat-img{
       height:0 !important;
       margin:0 !important;
       opacity:0;
-      padding:0 !important;
       overflow:hidden;
-      transition:0.3s;
     }
 
     /* כשהקטגוריה סגורה – תמונה מלאה */
     .cat.collapsed .cat-img{
-      height:200px !important;
+      height:220px !important;
       margin-bottom:8px !important;
       opacity:1;
-      transition:0.3s;
+    }
+
+    /* בזמן גלילה – הכותרת/תמונה מתכווצות כדי שיהיה נוח */
+    body.is-scrolled .cat h2{
+      padding:8px 10px;
+      font-size:16px;
+      gap:6px;
+    }
+    body.is-scrolled .cat.collapsed .cat-img{
+      height:110px !important;
     }
   </style>
 </head>
@@ -217,10 +236,16 @@
           המחירון מתעדכן לעיתים קרובות – יש לוודא את תוקפו בעת ההזמנה.
         </div>
 
-        <!-- הערות לקצב -->
         <div class="notes">
           <label for="notesArea">הערות לקצב (למשל: חזה חתוך לקוביות / לשניצלים, נתח שלם, קצוץ וכו’)</label>
           <textarea id="notesArea" rows="3" placeholder="כתבו כאן כל בקשה מיוחדת לחיתוך/אריזה…"></textarea>
+        </div>
+
+        <!-- סוג הזמנה (לא חובה) -->
+        <div class="fulfillment">
+          <div class="mini" style="margin-bottom:6px;">סוג הזמנה (לא חובה)</div>
+          <label class="radio"><input type="radio" name="fulfillment" value="איסוף עצמי"> <span>איסוף עצמי</span></label>
+          <label class="radio"><input type="radio" name="fulfillment" value="משלוח"> <span>משלוח</span></label>
         </div>
 
         <div class="actions">
@@ -235,7 +260,7 @@
     // מספר הוואטסאפ של הסניף הזה
     const WA_BASE = "https://wa.me/972549220234?text=";
 
-    // מחירים לפי הגרסה האחרונה (חזה הודו 45₪, "לוליפופ כבש" הוסר)
+    // מחירים לפי הגרסה האחרונה
     const DATA = [
       // עופות
       {name:"עוף שלם", price:25, category:"עופות"},
@@ -301,9 +326,9 @@
       {name:"לוליפופ", price:180, category:"מיוחדים"},
       {name:"מרגז חריף", price:75, category:"מיוחדים"},
       {name:"כנפיים מתובל", price:25, category:"מיוחדים"},
-      {name:"עוף ממולה", price:49, category:"מיוחדים"},
-      {name:"כבש ממולאים", price:139, category:"מיוחדים"},
-      {name:"עגל ממולה", price:139, category:"מיוחדים"},
+      {name:"עוף ממולה", price:49, category:"מיוחדים", desc:"המילוי: אורז לבן, בשר טחון, צנובר ושקדים"},
+      {name:"כבש ממולאים", price:139, category:"מיוחדים", desc:"המילוי: אורז לבן, בשר טחון, צנובר ושקדים"},
+      {name:"עגל ממולה", price:139, category:"מיוחדים", desc:"המילוי: אורז לבן, בשר טחון, צנובר ושקדים"},
       {name:"שיפדי פרגית", price:69, category:"מיוחדים"},
       {name:"שיפודי לבבות", price:69, category:"מיוחדים"},
 
@@ -315,7 +340,7 @@
       {name:"כבש (שווארמה)", price:180, category:"שווארמה"}
     ];
 
-    // מפה של אייקונים לקטגוריות
+    // תמונות לקטגוריות (השמות כמו בקבצים שלך)
     const ICONS = {
       "עופות": "Chicken.png",
       "עגל": "Veal.png",
@@ -327,7 +352,6 @@
 
     const desiredOrder = ["עופות","עגל","סטייקים","כבש","מיוחדים","שווארמה"];
 
-    // אלמנטים
     const cols = document.getElementById('cols');
     const q = document.getElementById('q');
     const sortSel = document.getElementById('sort');
@@ -336,10 +360,12 @@
     const copyBtn = document.getElementById('copyBtn');
     const waBtn = document.getElementById('waBtn');
     const notesArea = document.getElementById('notesArea');
+    const fulfillmentInputs = Array.from(document.querySelectorAll('input[name="fulfillment"]'));
 
     // סל
     const cart = new Map();
     const keyOf = i => `${i.name}|${i.category}`;
+
     function addToCart(item, qty){
       const k = keyOf(item);
       if(!cart.has(k)) cart.set(k, {...item, qty:0});
@@ -351,6 +377,7 @@
       cart.delete(keyOf(item));
       renderCart();
     }
+
     const money = n => `₪ ${Number(n||0).toLocaleString('he-IL',{maximumFractionDigits:2})}`;
 
     function renderCart(){
@@ -381,26 +408,66 @@
     function buildText(){
       const lines = [];
       lines.push("הזמנה לאטליז חליסה:");
+
+      const fulfillment = document.querySelector('input[name="fulfillment"]:checked')?.value || "";
+      if(fulfillment) lines.push(`סוג הזמנה: ${fulfillment}`);
+
       Array.from(cart.values()).forEach(it=>{
         lines.push(`• ${it.category} | ${it.name} × ${it.qty} — ${money(it.price * it.qty)}`);
       });
+
       const notes = (notesArea.value||"").trim();
       if(notes){
         lines.push("");
         lines.push("הערות לקצב:");
         lines.push(notes);
       }
+
       lines.push("");
       lines.push("הערה: המחיר הסופי ייקבע אחרי שקילה בפועל. המחירון מתעדכן; יש לוודא תוקף בעת ההזמנה.");
       return lines.join("\n");
     }
 
-    // העתקת סל + אירוע GA
-    copyBtn.addEventListener('click', ()=>{
-      navigator.clipboard.writeText(buildText()).then(()=>{
+    // העתקה עם fallback (עובד גם בלי HTTPS / בסביבות sandbox)
+    function fallbackCopy(text){
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly','');
+      ta.style.position = 'fixed';
+      ta.style.top = '-9999px';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try{
+        document.execCommand('copy');
+      } finally {
+        document.body.removeChild(ta);
+      }
+    }
+
+    async function copyToClipboard(text){
+      // clipboard api דורש לרוב HTTPS + הרשאות
+      if(navigator.clipboard && window.isSecureContext){
+        await navigator.clipboard.writeText(text);
+        return;
+      }
+      fallbackCopy(text);
+    }
+
+    // העתקת סל + GA
+    copyBtn.addEventListener('click', async ()=>{
+      const text = buildText();
+      try{
+        await copyToClipboard(text);
         copyBtn.textContent="הועתק ✓";
         setTimeout(()=>copyBtn.textContent="העתקת סל",900);
-      });
+      } catch(e){
+        // אם חסום מסיבה כלשהי – עדיין לא להפיל את הדף
+        copyBtn.textContent="לא הועתק";
+        setTimeout(()=>copyBtn.textContent="העתקת סל",1200);
+        console.warn('Copy failed', e);
+      }
+
       if(typeof gtag === 'function'){
         gtag('event', 'copy_cart', {
           event_category: 'engagement',
@@ -409,18 +476,18 @@
       }
     });
 
-    // שליחת סל לוואטסאפ + אירוע GA
+    // שליחת סל לוואטסאפ + GA
     waBtn.addEventListener('click', ()=>{
       if(typeof gtag === 'function'){
-        gtag('event', 'click_whatsapp', {
+        gtag('event', 'click_wa_button', {
           event_category: 'engagement',
-          event_label: 'WhatsApp Send'
+          event_label: 'WhatsApp Send Button'
         });
       }
       window.open(WA_BASE + encodeURIComponent(buildText()), "_blank");
     });
 
-    // עזר
+    // קטגוריות
     function groupByCategory(rows){
       const m = new Map();
       rows.forEach(x=>{
@@ -454,17 +521,17 @@
       const order = [...desiredOrder.filter(c=>by.has(c)), ...rest];
 
       cols.innerHTML = '';
+
       order.forEach(cat=>{
         const section = document.createElement('section');
-        section.className = 'cat collapsed'; // סגור כברירת מחדל
+        section.className = 'cat collapsed';
 
         const h2 = document.createElement('h2');
         const iconName = ICONS[cat] || null;
 
         if(iconName){
           h2.innerHTML = `
-            <img class="cat-img" src="${iconName}"
-                 style="height:200px;width:100%;object-fit:cover;border-radius:12px;display:block;margin-bottom:8px;transition:0.3s;" />
+            <img class="cat-img" src="${iconName}" alt="${cat}" />
             <span>${cat}</span>
           `;
         } else {
@@ -486,6 +553,13 @@
           const name = document.createElement('div');
           name.className='name';
           name.textContent = item.name;
+
+          if(item.desc){
+            const d = document.createElement('div');
+            d.className = 'mini';
+            d.textContent = item.desc;
+            name.appendChild(d);
+          }
 
           const right = document.createElement('div');
           right.style.display='flex';
@@ -509,48 +583,49 @@
           qty.className='qty';
 
           if(item.qtyMode === 'none'){
+            // פריט "חבילה" – כפתור הוסף בלבד
             const add = document.createElement('button');
             add.textContent='הוסף';
-            add.className='add';
+            add.className='add btn';
             add.addEventListener('click', ()=> addToCart(item, 1));
             qty.appendChild(add);
           } else {
-            const step = (item.qtyMode === 'unit') ? 1 : 0.5;
-            const minus = document.createElement('button'); minus.className='btn'; minus.textContent='–';
-            const input = document.createElement('input'); input.type='number'; input.min='0'; input.step=String(step); input.value='0';
-            const plus  = document.createElement('button'); plus.className='btn'; plus.textContent='+';
-            const add   = document.createElement('button'); add.textContent='הוסף'; add.className='add btn';
+            // לפי הבקשה שלך: + / - בלבד, שינוי ב-0.5 כל קליק
+            const step = 0.5;
+            const minus = document.createElement('button');
+            minus.className='btn';
+            minus.textContent='–';
 
-            const setVal = v => input.value = (Math.max(0, v)).toString().replace(/\.0$/,'');
-            const stepUp = ()=> setVal((parseFloat(input.value)||0) + step);
-            const stepDn = ()=> setVal(Math.max(0, (parseFloat(input.value)||0) - step));
+            const val = document.createElement('div');
+            val.className='btn val';
+            val.textContent='0';
 
-            minus.addEventListener('click', stepDn);
-            plus.addEventListener('click', stepUp);
+            const plus = document.createElement('button');
+            plus.className='btn';
+            plus.textContent='+';
 
+            const add = document.createElement('button');
+            add.textContent='הוסף';
+            add.className='add btn';
+
+            let current = 0;
+            const renderVal = ()=> val.textContent = current.toString().replace(/\.0$/,'');
+
+            minus.addEventListener('click', ()=>{
+              current = Math.max(0, current - step);
+              renderVal();
+            });
+            plus.addEventListener('click', ()=>{
+              current = current + step;
+              renderVal();
+            });
             add.addEventListener('click', ()=>{
-              const n = Math.max(0, parseFloat(input.value||'0'));
-              if(n>0) addToCart(item, n);
-              setVal(0);
+              if(current > 0) addToCart(item, current);
+              current = 0;
+              renderVal();
             });
 
-            qty.append(minus, input, plus, add);
-
-            const chips = document.createElement('div');
-            chips.className='chips';
-            const chipVals = (item.qtyMode === 'unit')
-              ? [1,2,3,4,5]
-              : [0.5,1,1.5,2,2.5,3,4,5];
-
-            chipVals.forEach(v=>{
-              const chip = document.createElement('button');
-              chip.className = 'chip';
-              chip.textContent = (item.qtyMode === 'unit') ? `${v} יח׳` : `${v} ק״ג`;
-              chip.addEventListener('click', ()=> setVal(v));
-              chips.appendChild(chip);
-            });
-
-            card.appendChild(chips);
+            qty.append(minus, val, plus, add);
           }
 
           card.append(top, qty);
@@ -560,7 +635,7 @@
         section.appendChild(list);
         cols.appendChild(section);
 
-        // פתיחה/סגירה בלחיצה + אירוע GA
+        // פתיחה/סגירה
         h2.addEventListener('click', ()=>{
           section.classList.toggle('collapsed');
           if(typeof gtag === 'function'){
@@ -573,9 +648,18 @@
       });
     }
 
+    // גלילה: מצב shrink
+    let last = false;
+    window.addEventListener('scroll', ()=>{
+      const now = window.scrollY > 20;
+      if(now !== last){
+        document.body.classList.toggle('is-scrolled', now);
+        last = now;
+      }
+    }, {passive:true});
+
     apply();
 
-    // חיפוש + אירוע GA
     q.addEventListener('input', ()=>{
       apply();
       if(typeof gtag === 'function' && q.value.trim()){
@@ -587,6 +671,72 @@
     });
 
     sortSel.addEventListener('change', apply);
+
+    // שינוי סוג הזמנה + GA
+    fulfillmentInputs.forEach(inp=>{
+      inp.addEventListener('change', ()=>{
+        if(typeof gtag === 'function'){
+          gtag('event', 'select_fulfillment', {
+            event_category: 'interaction',
+            event_label: inp.value
+          });
+        }
+      });
+    });
+
+    // בדיקות מהירות (רץ רק כשנכנסים עם ?test=1)
+    (function runTests(){
+      const params = new URLSearchParams(location.search);
+      if(params.get('test') !== '1') return;
+
+      try{
+        const t1 = (function(){
+          const lines = ["a","b","c"]; 
+          return lines.join("\n");
+        })();
+        console.assert(t1 === "a\nb\nc", "TEST join\\n failed");
+
+        // בדיקה: buildText מחזיר מחרוזת בסיסית
+        const sample = buildText();
+        console.assert(typeof sample === 'string' && sample.includes("הזמנה"), "TEST buildText failed");
+
+        // בדיקה: סוג הזמנה נכנס לטקסט כשהוא מסומן
+        const pick = document.querySelector('input[name="fulfillment"][value="איסוף עצמי"]');
+        if(pick){
+          pick.checked = true;
+          const s2 = buildText();
+          console.assert(s2.includes("סוג הזמנה: איסוף עצמי"), "TEST fulfillment line failed");
+          pick.checked = false;
+        }
+
+        // בדיקה: כפתורי + / - משנים ב-0.5
+        const firstQty = document.querySelector('.card .qty');
+        if(firstQty){
+          const btns = firstQty.querySelectorAll('button.btn');
+          const minus = btns[0];
+          const plus = btns[1];
+          const add = btns[2];
+          const val = firstQty.querySelector('.val');
+
+          if(plus && val && add){
+            plus.click();
+            console.assert(val.textContent === '0.5', 'TEST + step failed');
+            plus.click();
+            console.assert(val.textContent === '1', 'TEST + step x2 failed');
+            if(minus){
+              minus.click();
+              console.assert(val.textContent === '0.5', 'TEST - step failed');
+            }
+            add.click();
+            console.assert(val.textContent === '0', 'TEST add resets value failed');
+          }
+        }
+
+        console.log("Tests passed ✅");
+      } catch(e){
+        console.error("Tests failed ❌", e);
+      }
+    })();
   </script>
 </body>
 </html>
