@@ -16,7 +16,6 @@
 
   <style>
     :root{
-      /* Light theme */
       --bg:#ffffff;
       --paper:#f7f7f8;
       --card:#ffffff;
@@ -80,9 +79,14 @@
       display:flex;
       flex-direction:column;
       gap:8px;
+      outline:none;
     }
 
-    /* אקורדיון – חץ ופתיחה/סגירה */
+    .cat h2:focus{
+      box-shadow:0 0 0 3px rgba(22,163,74,.25);
+      border-radius:12px;
+    }
+
     .cat h2::after{
       content:"▼";
       font-size:12px;
@@ -109,7 +113,7 @@
 
     .qty{display:flex;gap:6px;align-items:center;margin-top:8px;flex-wrap:wrap}
     .qty .btn{padding:6px 10px;font-weight:700;font-size:15px;cursor:pointer}
-    .qty .val{min-width:56px;text-align:center;cursor:default}
+    .qty .val{min-width:88px;text-align:center;cursor:default}
     .qty .add{margin-inline-start:auto;border-color:#502f2f}
 
     .cart{
@@ -147,10 +151,42 @@
     .notes{margin-top:10px;display:flex;flex-direction:column;gap:6px}
     .notes label{font-size:13px;color:var(--muted)}
 
-    .fulfillment{margin-top:10px;padding:10px;border:1px dashed var(--line);border-radius:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .radio{display:flex;gap:8px;align-items:center;cursor:pointer;color:var(--ink)}
+    .fulfillment{
+      margin-top:10px;
+      padding:10px;
+      border:1px dashed var(--line);
+      border-radius:10px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .radios{display:flex;gap:8px;flex-wrap:wrap}
+    .radio{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      cursor:pointer;
+      color:var(--ink);
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#fff;
+      user-select:none;
+    }
     .radio input{accent-color:var(--cta);width:18px;height:18px}
-    .cta{background:var(--cta);border-color:var(--cta);color:#250606;font-weight:800}
+    .radio.is-active{
+      border-color:rgba(22,163,74,.55);
+      box-shadow:0 0 0 3px rgba(22,163,74,.15);
+    }
+
+    .cta{
+      background:var(--cta);
+      border-color:var(--cta);
+      color:#ffffff;
+      font-weight:800;
+    }
     .actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
 
     .two{display:grid;grid-template-columns:1fr 320px;gap:14px}
@@ -160,12 +196,11 @@
     }
 
     @media print{
-      .tools, .cta, #copyBtn, #waBtn, #notesArea {display:none}
+      .tools, .cta, #copyBtn, #waBtn, #clearBtn, #notesArea, #addressArea {display:none}
       body{background:#fff;color:#000}
       .card{box-shadow:none}
     }
 
-    /* תמונות קטגוריה */
     .cat-img{
       width:100%;
       height:220px;
@@ -178,7 +213,6 @@
       -webkit-font-smoothing:antialiased;
     }
 
-    /* כשהקטגוריה פתוחה – להעלים תמונה */
     .cat:not(.collapsed) .cat-img{
       height:0 !important;
       margin:0 !important;
@@ -186,14 +220,12 @@
       overflow:hidden;
     }
 
-    /* כשהקטגוריה סגורה – תמונה מלאה */
     .cat.collapsed .cat-img{
       height:220px !important;
       margin-bottom:8px !important;
       opacity:1;
     }
 
-    /* בזמן גלילה – הכותרת/תמונה מתכווצות כדי שיהיה נוח */
     body.is-scrolled .cat h2{
       padding:8px 10px;
       font-size:16px;
@@ -241,28 +273,40 @@
           <textarea id="notesArea" rows="3" placeholder="כתבו כאן כל בקשה מיוחדת לחיתוך/אריזה…"></textarea>
         </div>
 
-        <!-- סוג הזמנה (לא חובה) -->
+        <!-- סוג הזמנה (חובה) -->
         <div class="fulfillment">
-          <div class="mini" style="margin-bottom:6px;">סוג הזמנה (לא חובה)</div>
-          <label class="radio"><input type="radio" name="fulfillment" value="איסוף עצמי"> <span>איסוף עצמי</span></label>
-          <label class="radio"><input type="radio" name="fulfillment" value="משלוח"> <span>משלוח</span></label>
+          <div class="mini" style="width:100%;">סוג הזמנה (חובה)</div>
+          <div class="radios" id="fulfillmentWrap">
+            <label class="radio" data-radio="איסוף עצמי">
+              <input type="radio" name="fulfillment" value="איסוף עצמי" required>
+              <span>איסוף עצמי</span>
+            </label>
+            <label class="radio" data-radio="משלוח">
+              <input type="radio" name="fulfillment" value="משלוח" required>
+              <span>משלוח</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- כתובת למשלוח (מופיע רק כשבוחרים משלוח) -->
+        <div class="notes" id="addressBlock" style="display:none;">
+          <label for="addressArea">כתובת למשלוח (חובה)</label>
+          <textarea id="addressArea" rows="2" placeholder="רחוב, מספר, עיר, קומה/דירה אם צריך…"></textarea>
         </div>
 
         <div class="actions">
           <button id="copyBtn">העתקת סל</button>
           <button id="waBtn" class="cta">שליחה ל־WhatsApp</button>
+          <button id="clearBtn">נקה סל</button>
         </div>
       </aside>
     </div>
   </div>
 
   <script>
-    // מספר הוואטסאפ של הסניף הזה
     const WA_BASE = "https://wa.me/972549220234?text=";
 
-    // מחירים לפי הגרסה האחרונה
     const DATA = [
-      // עופות
       {name:"עוף שלם", price:25, category:"עופות"},
       {name:"כבד עוף", price:30, category:"עופות"},
       {name:"לבבות", price:35, category:"עופות"},
@@ -277,7 +321,6 @@
       {name:"חזה הודו", price:45, category:"עופות"},
       {name:"כרעיים 4 קילו", price:100, category:"עופות", qtyMode:"none"},
 
-      // עגל
       {name:"בשר טחון", price:66, category:"עגל"},
       {name:"זנב עגל", price:54, category:"עגל"},
       {name:"לשון עגל", price:75, category:"עגל"},
@@ -292,7 +335,6 @@
       {name:"שייטל", price:109, category:"עגל"},
       {name:"בשר עגלה", price:80, category:"עגל"},
 
-      // סטייקים
       {name:"צלעות טיבון", price:180, category:"סטייקים"},
       {name:"צלעות בייבי", price:249, category:"סטייקים"},
       {name:"דפי אסאדו", price:100, category:"סטייקים"},
@@ -307,7 +349,6 @@
       {name:"טיבון בלאק אנגוס", price:180, category:"סטייקים"},
       {name:"טומהוק", price:180, category:"סטייקים"},
 
-      // כבש
       {name:"כבש בלי עצם", price:180, category:"כבש"},
       {name:"כבש עם עצם", price:129, category:"כבש"},
       {name:"לייה בלדי", price:120, category:"כבש"},
@@ -318,7 +359,6 @@
       {name:"צוור כבש", price:129, category:"כבש"},
       {name:"כתף כבש", price:129, category:"כבש"},
 
-      // מיוחדים
       {name:"עראיס", price:69, category:"מיוחדים"},
       {name:"המבורגר", price:75, category:"מיוחדים"},
       {name:"קבב", price:75, category:"מיוחדים"},
@@ -332,7 +372,6 @@
       {name:"שיפדי פרגית", price:69, category:"מיוחדים"},
       {name:"שיפודי לבבות", price:69, category:"מיוחדים"},
 
-      // שווארמה
       {name:"עגל (שווארמה)", price:85, category:"שווארמה"},
       {name:"הודו נקבה", price:70, category:"שווארמה"},
       {name:"עוף (שווארמה)", price:45, category:"שווארמה"},
@@ -340,7 +379,6 @@
       {name:"כבש (שווארמה)", price:180, category:"שווארמה"}
     ];
 
-    // תמונות לקטגוריות (השמות כמו בקבצים שלך)
     const ICONS = {
       "עופות": "Chicken.png",
       "עגל": "Veal.png",
@@ -359,26 +397,128 @@
     const cartList = document.getElementById('cartList');
     const copyBtn = document.getElementById('copyBtn');
     const waBtn = document.getElementById('waBtn');
+    const clearBtn = document.getElementById('clearBtn');
     const notesArea = document.getElementById('notesArea');
+
+    const addressBlock = document.getElementById('addressBlock');
+    const addressArea = document.getElementById('addressArea');
+    const fulfillmentLabels = Array.from(document.querySelectorAll('#fulfillmentWrap .radio'));
     const fulfillmentInputs = Array.from(document.querySelectorAll('input[name="fulfillment"]'));
 
-    // סל
+    const LS_KEY = 'halisa_cart_v1';
+
     const cart = new Map();
     const keyOf = i => `${i.name}|${i.category}`;
+    const isUnitItem = item => item.qtyMode === 'unit';
+    const unitLabelOf = item => isUnitItem(item) ? 'יח׳' : 'ק״ג';
+
+    const roundToStep = (n, step) => Math.round((Number(n)||0) / step) * step;
+
+    const normalizeQty = (item, qty) => {
+      if(isUnitItem(item)) return Math.max(0, Math.round(Number(qty)||0));
+      return Math.max(0, roundToStep(qty, 0.5));
+    };
+
+    const fmtQty = (item, qty) => {
+      const n = Number(qty)||0;
+      const txt = isUnitItem(item) ? n.toFixed(0) : n.toFixed(1).replace(/\.0$/,'');
+      return `${txt} ${unitLabelOf(item)}`;
+    };
+
+    const money = n => `₪ ${Number(n||0).toLocaleString('he-IL',{maximumFractionDigits:2})}`;
+
+    function saveState(){
+      try{
+        const payload = {
+          cart: Array.from(cart.values()).map(it=>({
+            name: it.name,
+            category: it.category,
+            price: it.price,
+            qty: it.qty,
+            qtyMode: it.qtyMode || null
+          })),
+          notes: notesArea.value || "",
+          fulfillment: document.querySelector('input[name="fulfillment"]:checked')?.value || "",
+          address: addressArea.value || ""
+        };
+        localStorage.setItem(LS_KEY, JSON.stringify(payload));
+      } catch(e){}
+    }
+
+    function loadState(){
+      try{
+        const raw = localStorage.getItem(LS_KEY);
+        if(!raw) return;
+
+        const payload = JSON.parse(raw);
+        if(payload?.cart?.length){
+          payload.cart.forEach(it=>{
+            const k = `${it.name}|${it.category}`;
+            cart.set(k, it);
+          });
+        }
+
+        if(typeof payload.notes === 'string') notesArea.value = payload.notes;
+
+        if(payload.fulfillment){
+          const inp = document.querySelector(`input[name="fulfillment"][value="${payload.fulfillment}"]`);
+          if(inp) inp.checked = true;
+        } else {
+          // ברירת מחדל: איסוף עצמי
+          const def = document.querySelector(`input[name="fulfillment"][value="איסוף עצמי"]`);
+          if(def) def.checked = true;
+        }
+
+        if(typeof payload.address === 'string') addressArea.value = payload.address;
+
+        syncFulfillmentUI();
+        renderCart();
+      } catch(e){
+        // אם משהו נדפק ב-localStorage לא להפיל את הדף
+      }
+    }
+
+    function syncFulfillmentUI(){
+      const val = document.querySelector('input[name="fulfillment"]:checked')?.value || "";
+      fulfillmentLabels.forEach(lbl=>{
+        lbl.classList.toggle('is-active', lbl.dataset.radio === val);
+      });
+
+      if(val === 'משלוח'){
+        addressBlock.style.display = 'flex';
+      } else {
+        addressBlock.style.display = 'none';
+      }
+      saveState();
+    }
 
     function addToCart(item, qty){
       const k = keyOf(item);
+      const addQty = normalizeQty(item, qty);
+      if(addQty <= 0) return;
+
       if(!cart.has(k)) cart.set(k, {...item, qty:0});
-      cart.get(k).qty = Math.max(0, (Number(cart.get(k).qty)||0) + qty);
-      if(cart.get(k).qty === 0) cart.delete(k);
+      const current = Number(cart.get(k).qty)||0;
+      const next = normalizeQty(item, current + addQty);
+
+      if(next <= 0) cart.delete(k);
+      else cart.get(k).qty = next;
+
       renderCart();
+      saveState();
     }
+
     function removeItem(item){
       cart.delete(keyOf(item));
       renderCart();
+      saveState();
     }
 
-    const money = n => `₪ ${Number(n||0).toLocaleString('he-IL',{maximumFractionDigits:2})}`;
+    function clearCart(){
+      cart.clear();
+      renderCart();
+      saveState();
+    }
 
     function renderCart(){
       cartList.innerHTML = '';
@@ -389,11 +529,11 @@
         const left = document.createElement('div');
         left.innerHTML =
           `<div><strong>${it.name}</strong> <span class="mini">(${it.category})</span></div>
-           <div class="mini">${money(it.price)} × ${it.qty}</div>`;
+           <div class="mini">${money(it.price)} × ${fmtQty(it, it.qty)}</div>`;
 
         const priceEl = document.createElement('div');
         priceEl.className='mini';
-        priceEl.textContent = money(it.price * it.qty);
+        priceEl.textContent = money(it.price * (Number(it.qty)||0));
 
         const del = document.createElement('button');
         del.className='del';
@@ -405,15 +545,37 @@
       });
     }
 
+    function validateFulfillment(){
+      const fulfillment = document.querySelector('input[name="fulfillment"]:checked')?.value || "";
+      if(!fulfillment){
+        alert("בחרו סוג הזמנה: איסוף עצמי או משלוח");
+        return false;
+      }
+      if(fulfillment === 'משלוח'){
+        const addr = (addressArea.value||"").trim();
+        if(!addr){
+          alert("במשלוח חובה למלא כתובת למשלוח");
+          addressArea.focus();
+          return false;
+        }
+      }
+      return true;
+    }
+
     function buildText(){
       const lines = [];
       lines.push("הזמנה לאטליז חליסה:");
 
       const fulfillment = document.querySelector('input[name="fulfillment"]:checked')?.value || "";
-      if(fulfillment) lines.push(`סוג הזמנה: ${fulfillment}`);
+      lines.push(`סוג הזמנה: ${fulfillment || "—"}`);
+
+      if(fulfillment === 'משלוח'){
+        const addr = (addressArea.value||"").trim();
+        if(addr) lines.push(`כתובת למשלוח: ${addr}`);
+      }
 
       Array.from(cart.values()).forEach(it=>{
-        lines.push(`• ${it.category} | ${it.name} × ${it.qty} — ${money(it.price * it.qty)}`);
+        lines.push(`• ${it.category} | ${it.name} × ${fmtQty(it, it.qty)} — ${money(it.price * (Number(it.qty)||0))}`);
       });
 
       const notes = (notesArea.value||"").trim();
@@ -428,7 +590,6 @@
       return lines.join("\n");
     }
 
-    // העתקה עם fallback (עובד גם בלי HTTPS / בסביבות sandbox)
     function fallbackCopy(text){
       const ta = document.createElement('textarea');
       ta.value = text;
@@ -438,15 +599,11 @@
       ta.style.opacity = '0';
       document.body.appendChild(ta);
       ta.select();
-      try{
-        document.execCommand('copy');
-      } finally {
-        document.body.removeChild(ta);
-      }
+      try{ document.execCommand('copy'); }
+      finally { document.body.removeChild(ta); }
     }
 
     async function copyToClipboard(text){
-      // clipboard api דורש לרוב HTTPS + הרשאות
       if(navigator.clipboard && window.isSecureContext){
         await navigator.clipboard.writeText(text);
         return;
@@ -454,15 +611,15 @@
       fallbackCopy(text);
     }
 
-    // העתקת סל + GA
     copyBtn.addEventListener('click', async ()=>{
+      if(!validateFulfillment()) return;
+
       const text = buildText();
       try{
         await copyToClipboard(text);
         copyBtn.textContent="הועתק ✓";
         setTimeout(()=>copyBtn.textContent="העתקת סל",900);
       } catch(e){
-        // אם חסום מסיבה כלשהי – עדיין לא להפיל את הדף
         copyBtn.textContent="לא הועתק";
         setTimeout(()=>copyBtn.textContent="העתקת סל",1200);
         console.warn('Copy failed', e);
@@ -476,8 +633,9 @@
       }
     });
 
-    // שליחת סל לוואטסאפ + GA
     waBtn.addEventListener('click', ()=>{
+      if(!validateFulfillment()) return;
+
       if(typeof gtag === 'function'){
         gtag('event', 'click_wa_button', {
           event_category: 'engagement',
@@ -487,7 +645,31 @@
       window.open(WA_BASE + encodeURIComponent(buildText()), "_blank");
     });
 
-    // קטגוריות
+    clearBtn.addEventListener('click', ()=>{
+      clearCart();
+      if(typeof gtag === 'function'){
+        gtag('event', 'clear_cart', {
+          event_category: 'engagement',
+          event_label: 'Cart Cleared'
+        });
+      }
+    });
+
+    notesArea.addEventListener('input', saveState);
+    addressArea.addEventListener('input', saveState);
+
+    fulfillmentInputs.forEach(inp=>{
+      inp.addEventListener('change', ()=>{
+        syncFulfillmentUI();
+        if(typeof gtag === 'function'){
+          gtag('event', 'select_fulfillment', {
+            event_category: 'interaction',
+            event_label: inp.value
+          });
+        }
+      });
+    });
+
     function groupByCategory(rows){
       const m = new Map();
       rows.forEach(x=>{
@@ -499,9 +681,19 @@
     }
 
     function apply(){
-      const term = (q.value||"").trim();
+      const term = (q.value||"").trim().toLowerCase();
       const s = sortSel.value;
-      let rows = DATA.filter(x => !term || (x.name && x.name.includes(term)));
+
+      let rows = DATA.filter(x=>{
+        if(!term) return true;
+        const hay = [
+          x.name || "",
+          x.desc || "",
+          x.category || ""
+        ].join(" ").toLowerCase();
+        return hay.includes(term);
+      });
+
       const cmp = (a,b)=>{
         if (s==='name-asc')  return (a.name||'').localeCompare(b.name||'','he');
         if (s==='name-desc') return (b.name||'').localeCompare(a.name||'','he');
@@ -510,6 +702,19 @@
         return 0;
       };
       render(rows, cmp);
+    }
+
+    function toggleSection(section, h2, cat){
+      section.classList.toggle('collapsed');
+      const expanded = !section.classList.contains('collapsed');
+      h2.setAttribute('aria-expanded', String(expanded));
+
+      if(typeof gtag === 'function'){
+        gtag('event', 'toggle_category', {
+          event_category: 'navigation',
+          event_label: cat
+        });
+      }
     }
 
     function render(rows, cmp){
@@ -527,11 +732,14 @@
         section.className = 'cat collapsed';
 
         const h2 = document.createElement('h2');
+        h2.setAttribute('role','button');
+        h2.setAttribute('tabindex','0');
+        h2.setAttribute('aria-expanded','false');
         const iconName = ICONS[cat] || null;
 
         if(iconName){
           h2.innerHTML = `
-            <img class="cat-img" src="${iconName}" alt="${cat}" />
+            <img class="cat-img" loading="lazy" src="${iconName}" alt="${cat}" />
             <span>${cat}</span>
           `;
         } else {
@@ -583,22 +791,22 @@
           qty.className='qty';
 
           if(item.qtyMode === 'none'){
-            // פריט "חבילה" – כפתור הוסף בלבד
             const add = document.createElement('button');
             add.textContent='הוסף';
             add.className='add btn';
             add.addEventListener('click', ()=> addToCart(item, 1));
             qty.appendChild(add);
           } else {
-            // לפי הבקשה שלך: + / - בלבד, שינוי ב-0.5 כל קליק
-            const step = 0.5;
+            const isUnit = item.qtyMode === 'unit';
+            const step = isUnit ? 1 : 0.5;
+            const unitLbl = isUnit ? 'יח׳' : 'ק״ג';
+
             const minus = document.createElement('button');
             minus.className='btn';
             minus.textContent='–';
 
             const val = document.createElement('div');
             val.className='btn val';
-            val.textContent='0';
 
             const plus = document.createElement('button');
             plus.className='btn';
@@ -609,18 +817,24 @@
             add.className='add btn';
 
             let current = 0;
-            const renderVal = ()=> val.textContent = current.toString().replace(/\.0$/,'');
+
+            const renderVal = ()=>{
+              const txt = isUnit ? current.toFixed(0) : current.toFixed(1).replace(/\.0$/,'');
+              val.textContent = `${txt} ${unitLbl}`;
+            };
+            renderVal();
 
             minus.addEventListener('click', ()=>{
-              current = Math.max(0, current - step);
+              current = Math.max(0, roundToStep(current - step, step));
               renderVal();
             });
             plus.addEventListener('click', ()=>{
-              current = current + step;
+              current = roundToStep(current + step, step);
               renderVal();
             });
             add.addEventListener('click', ()=>{
-              if(current > 0) addToCart(item, current);
+              const normalized = normalizeQty(item, current);
+              if(normalized > 0) addToCart(item, normalized);
               current = 0;
               renderVal();
             });
@@ -635,20 +849,16 @@
         section.appendChild(list);
         cols.appendChild(section);
 
-        // פתיחה/סגירה
-        h2.addEventListener('click', ()=>{
-          section.classList.toggle('collapsed');
-          if(typeof gtag === 'function'){
-            gtag('event', 'toggle_category', {
-              event_category: 'navigation',
-              event_label: cat
-            });
+        h2.addEventListener('click', ()=> toggleSection(section, h2, cat));
+        h2.addEventListener('keydown', (e)=>{
+          if(e.key === 'Enter' || e.key === ' '){
+            e.preventDefault();
+            toggleSection(section, h2, cat);
           }
         });
       });
     }
 
-    // גלילה: מצב shrink
     let last = false;
     window.addEventListener('scroll', ()=>{
       const now = window.scrollY > 20;
@@ -657,8 +867,6 @@
         last = now;
       }
     }, {passive:true});
-
-    apply();
 
     q.addEventListener('input', ()=>{
       apply();
@@ -672,71 +880,18 @@
 
     sortSel.addEventListener('change', apply);
 
-    // שינוי סוג הזמנה + GA
-    fulfillmentInputs.forEach(inp=>{
-      inp.addEventListener('change', ()=>{
-        if(typeof gtag === 'function'){
-          gtag('event', 'select_fulfillment', {
-            event_category: 'interaction',
-            event_label: inp.value
-          });
-        }
-      });
-    });
+    // Init
+    loadState();
+    if(!document.querySelector('input[name="fulfillment"]:checked')){
+      const def = document.querySelector(`input[name="fulfillment"][value="איסוף עצמי"]`);
+      if(def) def.checked = true;
+      syncFulfillmentUI();
+    } else {
+      syncFulfillmentUI();
+    }
 
-    // בדיקות מהירות (רץ רק כשנכנסים עם ?test=1)
-    (function runTests(){
-      const params = new URLSearchParams(location.search);
-      if(params.get('test') !== '1') return;
-
-      try{
-        const t1 = (function(){
-          const lines = ["a","b","c"]; 
-          return lines.join("\n");
-        })();
-        console.assert(t1 === "a\nb\nc", "TEST join\\n failed");
-
-        // בדיקה: buildText מחזיר מחרוזת בסיסית
-        const sample = buildText();
-        console.assert(typeof sample === 'string' && sample.includes("הזמנה"), "TEST buildText failed");
-
-        // בדיקה: סוג הזמנה נכנס לטקסט כשהוא מסומן
-        const pick = document.querySelector('input[name="fulfillment"][value="איסוף עצמי"]');
-        if(pick){
-          pick.checked = true;
-          const s2 = buildText();
-          console.assert(s2.includes("סוג הזמנה: איסוף עצמי"), "TEST fulfillment line failed");
-          pick.checked = false;
-        }
-
-        // בדיקה: כפתורי + / - משנים ב-0.5
-        const firstQty = document.querySelector('.card .qty');
-        if(firstQty){
-          const btns = firstQty.querySelectorAll('button.btn');
-          const minus = btns[0];
-          const plus = btns[1];
-          const add = btns[2];
-          const val = firstQty.querySelector('.val');
-
-          if(plus && val && add){
-            plus.click();
-            console.assert(val.textContent === '0.5', 'TEST + step failed');
-            plus.click();
-            console.assert(val.textContent === '1', 'TEST + step x2 failed');
-            if(minus){
-              minus.click();
-              console.assert(val.textContent === '0.5', 'TEST - step failed');
-            }
-            add.click();
-            console.assert(val.textContent === '0', 'TEST add resets value failed');
-          }
-        }
-
-        console.log("Tests passed ✅");
-      } catch(e){
-        console.error("Tests failed ❌", e);
-      }
-    })();
+    apply();
+    renderCart();
   </script>
 </body>
 </html>
