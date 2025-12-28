@@ -234,6 +234,58 @@
     body.is-scrolled .cat.collapsed .cat-img{
       height:110px !important;
     }
+
+    /* כפתור סל צף */
+    #cartFab{
+      position:fixed;
+      left:16px;
+      top:16px;
+      bottom:auto;
+      z-index:9999;
+      display:none;
+      align-items:center;
+      gap:8px;
+      padding:10px 12px;
+      border-radius:999px;
+      background:var(--card);
+      border:1px solid var(--line);
+      color:var(--ink);
+      box-shadow:0 10px 22px rgba(0,0,0,.12);
+      cursor:pointer;
+      font:inherit;
+    }
+    #cartFab .badge{
+      background:var(--cta);
+      color:#fff;
+      border-radius:999px;
+      padding:2px 8px;
+      font-size:12px;
+      font-weight:800;
+      line-height:18px;
+      min-width:22px;
+      text-align:center;
+    }
+    #cartFab svg{
+      width:18px;
+      height:18px;
+      display:block;
+      opacity:.9;
+    }
+    #cartFab:focus{
+      outline:none;
+      box-shadow:0 0 0 3px rgba(22,163,74,.20), 0 10px 22px rgba(0,0,0,.12);
+    }
+    @media print{ #cartFab{display:none!important} }
+
+    /* היילייט לסל */
+    .cart.cart-flash{
+      animation: cartFlash 1100ms ease;
+    }
+    @keyframes cartFlash{
+      0%   { box-shadow:0 0 0 0 rgba(22,163,74,0), 0 0 0 rgba(0,0,0,0); }
+      25%  { box-shadow:0 0 0 4px rgba(22,163,74,.18), 0 14px 26px rgba(0,0,0,.14); }
+      100% { box-shadow:0 0 0 0 rgba(22,163,74,0), 0 2px 6px rgba(0,0,0,.08); }
+    }
   </style>
 </head>
 <body>
@@ -303,6 +355,15 @@
     </div>
   </div>
 
+  <!-- כפתור סל צף (חייב להיות לפני הסקריפט) -->
+  <button id="cartFab" type="button" aria-label="מעבר לסל">
+    <span class="badge" id="cartFabBadge">0</span>
+    <span style="font-weight:800;">סל</span>
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="currentColor" d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2Zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2ZM7.16 14h9.92c.75 0 1.4-.41 1.74-1.03L21 7H6.21L5.27 5H2v2h2l3.6 7.59-1.35 2.44C5.52 18.37 6.48 20 8 20h12v-2H8l1.16-2Z"/>
+    </svg>
+  </button>
+
   <script>
     const WA_BASE = "https://wa.me/972549220234?text=";
 
@@ -369,7 +430,7 @@
       {name:"עוף ממולה", price:49, category:"מיוחדים", desc:"המילוי: אורז לבן, בשר טחון, צנובר ושקדים"},
       {name:"כבש ממולאים", price:139, category:"מיוחדים", desc:"המילוי: אורז לבן, בשר טחון, צנובר ושקדים"},
       {name:"עגל ממולה", price:139, category:"מיוחדים", desc:"המילוי: אורז לבן, בשר טחון, צנובר ושקדים"},
-      {name:"שיפדי פרגית", price:69, category:"מיוחדים"},
+      {name:"שיפודי פרגית", price:69, category:"מיוחדים"},
       {name:"שיפודי לבבות", price:69, category:"מיוחדים"},
 
       {name:"עגל (שווארמה)", price:85, category:"שווארמה"},
@@ -409,6 +470,7 @@
 
     const cart = new Map();
     const keyOf = i => `${i.name}|${i.category}`;
+
     const isUnitItem = item => item.qtyMode === 'unit';
     const unitLabelOf = item => isUnitItem(item) ? 'יח׳' : 'ק״ג';
 
@@ -426,6 +488,37 @@
     };
 
     const money = n => `₪ ${Number(n||0).toLocaleString('he-IL',{maximumFractionDigits:2})}`;
+
+    // סל צף
+    const cartFab = document.getElementById('cartFab');
+    const cartFabBadge = document.getElementById('cartFabBadge');
+    const cartBox = document.querySelector('aside.cart');
+
+    function updateCartFab(){
+      if(!cartFab || !cartFabBadge) return;
+      const itemsCount = cart.size; // מספר פריטים שונים בסל
+      cartFab.style.display = itemsCount > 0 ? 'flex' : 'none';
+      cartFabBadge.textContent = String(itemsCount);
+    }
+
+    function flashCart(){
+      if(!cartBox) return;
+      cartBox.classList.remove('cart-flash');
+      void cartBox.offsetWidth;
+      cartBox.classList.add('cart-flash');
+    }
+
+    if(cartFab){
+      cartFab.addEventListener('click', ()=>{
+        if(!cartBox) return;
+        cartBox.scrollIntoView({ behavior:'smooth', block:'start' });
+        setTimeout(flashCart, 450);
+
+        if(typeof gtag === 'function'){
+          gtag('event', 'click_cart_fab', { event_category:'navigation', event_label:'Floating Cart Button' });
+        }
+      });
+    }
 
     function saveState(){
       try{
@@ -464,7 +557,6 @@
           const inp = document.querySelector(`input[name="fulfillment"][value="${payload.fulfillment}"]`);
           if(inp) inp.checked = true;
         } else {
-          // ברירת מחדל: איסוף עצמי
           const def = document.querySelector(`input[name="fulfillment"][value="איסוף עצמי"]`);
           if(def) def.checked = true;
         }
@@ -473,9 +565,7 @@
 
         syncFulfillmentUI();
         renderCart();
-      } catch(e){
-        // אם משהו נדפק ב-localStorage לא להפיל את הדף
-      }
+      } catch(e){}
     }
 
     function syncFulfillmentUI(){
@@ -484,11 +574,7 @@
         lbl.classList.toggle('is-active', lbl.dataset.radio === val);
       });
 
-      if(val === 'משלוח'){
-        addressBlock.style.display = 'flex';
-      } else {
-        addressBlock.style.display = 'none';
-      }
+      addressBlock.style.display = (val === 'משלוח') ? 'flex' : 'none';
       saveState();
     }
 
@@ -543,6 +629,8 @@
         line.append(left, priceEl, del);
         cartList.append(line);
       });
+
+      updateCartFab();
     }
 
     function validateFulfillment(){
@@ -622,14 +710,10 @@
       } catch(e){
         copyBtn.textContent="לא הועתק";
         setTimeout(()=>copyBtn.textContent="העתקת סל",1200);
-        console.warn('Copy failed', e);
       }
 
       if(typeof gtag === 'function'){
-        gtag('event', 'copy_cart', {
-          event_category: 'engagement',
-          event_label: 'Cart Copied'
-        });
+        gtag('event', 'copy_cart', { event_category:'engagement', event_label:'Cart Copied' });
       }
     });
 
@@ -637,10 +721,7 @@
       if(!validateFulfillment()) return;
 
       if(typeof gtag === 'function'){
-        gtag('event', 'click_wa_button', {
-          event_category: 'engagement',
-          event_label: 'WhatsApp Send Button'
-        });
+        gtag('event', 'click_wa_button', { event_category:'engagement', event_label:'WhatsApp Send Button' });
       }
       window.open(WA_BASE + encodeURIComponent(buildText()), "_blank");
     });
@@ -648,10 +729,7 @@
     clearBtn.addEventListener('click', ()=>{
       clearCart();
       if(typeof gtag === 'function'){
-        gtag('event', 'clear_cart', {
-          event_category: 'engagement',
-          event_label: 'Cart Cleared'
-        });
+        gtag('event', 'clear_cart', { event_category:'engagement', event_label:'Cart Cleared' });
       }
     });
 
@@ -662,10 +740,7 @@
       inp.addEventListener('change', ()=>{
         syncFulfillmentUI();
         if(typeof gtag === 'function'){
-          gtag('event', 'select_fulfillment', {
-            event_category: 'interaction',
-            event_label: inp.value
-          });
+          gtag('event', 'select_fulfillment', { event_category:'interaction', event_label: inp.value });
         }
       });
     });
@@ -686,11 +761,7 @@
 
       let rows = DATA.filter(x=>{
         if(!term) return true;
-        const hay = [
-          x.name || "",
-          x.desc || "",
-          x.category || ""
-        ].join(" ").toLowerCase();
+        const hay = [x.name||"", x.desc||"", x.category||""].join(" ").toLowerCase();
         return hay.includes(term);
       });
 
@@ -701,6 +772,7 @@
         if (s==='price-desc')return (b.price??-Infinity) - (a.price??-Infinity);
         return 0;
       };
+
       render(rows, cmp);
     }
 
@@ -710,10 +782,7 @@
       h2.setAttribute('aria-expanded', String(expanded));
 
       if(typeof gtag === 'function'){
-        gtag('event', 'toggle_category', {
-          event_category: 'navigation',
-          event_label: cat
-        });
+        gtag('event', 'toggle_category', { event_category:'navigation', event_label: cat });
       }
     }
 
@@ -735,8 +804,8 @@
         h2.setAttribute('role','button');
         h2.setAttribute('tabindex','0');
         h2.setAttribute('aria-expanded','false');
-        const iconName = ICONS[cat] || null;
 
+        const iconName = ICONS[cat] || null;
         if(iconName){
           h2.innerHTML = `
             <img class="cat-img" loading="lazy" src="${iconName}" alt="${cat}" />
@@ -764,7 +833,7 @@
 
           if(item.desc){
             const d = document.createElement('div');
-            d.className = 'mini';
+            d.className='mini';
             d.textContent = item.desc;
             name.appendChild(d);
           }
@@ -828,10 +897,12 @@
               current = Math.max(0, roundToStep(current - step, step));
               renderVal();
             });
+
             plus.addEventListener('click', ()=>{
               current = roundToStep(current + step, step);
               renderVal();
             });
+
             add.addEventListener('click', ()=>{
               const normalized = normalizeQty(item, current);
               if(normalized > 0) addToCart(item, normalized);
@@ -868,19 +939,7 @@
       }
     }, {passive:true});
 
-    q.addEventListener('input', ()=>{
-      apply();
-      if(typeof gtag === 'function' && q.value.trim()){
-        gtag('event', 'search', {
-          event_category: 'interaction',
-          event_label: q.value.trim()
-        });
-      }
-    });
-
-    sortSel.addEventListener('change', apply);
-
-    // Init
+    // init
     loadState();
     if(!document.querySelector('input[name="fulfillment"]:checked')){
       const def = document.querySelector(`input[name="fulfillment"][value="איסוף עצמי"]`);
@@ -892,6 +951,15 @@
 
     apply();
     renderCart();
+
+    q.addEventListener('input', ()=>{
+      apply();
+      if(typeof gtag === 'function' && q.value.trim()){
+        gtag('event', 'search', { event_category:'interaction', event_label: q.value.trim() });
+      }
+    });
+
+    sortSel.addEventListener('change', apply);
   </script>
 </body>
 </html>
