@@ -466,6 +466,57 @@
       25%  { box-shadow:0 0 0 4px rgba(22,163,74,.18), 0 14px 26px rgba(0,0,0,.14); }
       100% { box-shadow:0 0 0 0 rgba(22,163,74,0), 0 2px 6px rgba(0,0,0,.08); }
     }
+
+    /* ===== פוטר עדין לסניף חליסה ===== */
+    .site-footer{
+      margin-top:16px;
+      padding-top:12px;
+      border-top:1px solid var(--line);
+      color:var(--muted);
+      font-size:12.5px;
+      line-height:1.6;
+    }
+    .footer-row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+    }
+
+    .footer-addr{
+      color:inherit;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      min-width:min(520px,100%);
+    }
+    .footer-addr:hover{text-decoration:underline}
+    .footer-addr strong{color:var(--ink);font-weight:800}
+
+    .footer-hours{white-space:nowrap}
+
+    .footer-social{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      flex-shrink:0;
+    }
+    .icon-link{
+      width:34px;
+      height:34px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid var(--line);
+      background:rgba(0,0,0,.02);
+      border-radius:999px;
+      color:inherit;
+      text-decoration:none;
+    }
+    .icon-link:hover{filter:brightness(.98)}
+    .icon-link svg{width:16px;height:16px;display:block;opacity:.88}
   </style>
 </head>
 <body>
@@ -536,6 +587,34 @@
         </div>
       </aside>
     </div>
+
+    <!-- פוטר (חליסה בלבד) -->
+    <footer class="site-footer" aria-label="פרטי סניף חליסה">
+      <div class="footer-row">
+        <!-- כתובת ראשונה + ניווט -->
+        <a class="footer-addr" href="https://www.google.com/maps/place/%D7%90%D7%98%D7%9C%D7%99%D7%96+%D7%97%D7%9C%D7%99%D7%A1%D7%94%E2%80%AD/@32.8030133,35.0080511,785m/data=!3m2!1e3!4b1!4m6!3m5!1s0x151dba5add0e820d:0x9ab7c1554f14df87!8m2!3d32.8030133!4d35.0080511!16s%2Fg%2F11hdpmd14v?entry=ttu&g_ep=EgoyMDI2MDExMy4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener">
+          <strong>כתובת:</strong>
+          <span>רח׳ הגיבורים 28, חיפה (שכונת חליסה)</span>
+        </a>
+
+        <!-- שעות פעילות -->
+        <div class="footer-hours"><strong>שעות פעילות:</strong> שני–שבת 9:00–18:00</div>
+
+        <!-- סושיאל אייקונים בלבד -->
+        <div class="footer-social" aria-label="קישורים חברתיים">
+          <a class="icon-link" href="https://www.instagram.com/halisaa_butchery/" target="_blank" rel="noopener" aria-label="אינסטגרם">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="currentColor" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm10 2H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3Zm-5 4.5A5.5 5.5 0 1 1 6.5 14 5.5 5.5 0 0 1 12 8.5Zm0 2A3.5 3.5 0 1 0 15.5 14 3.5 3.5 0 0 0 12 10.5ZM18 6.8a1.2 1.2 0 1 1-1.2-1.2A1.2 1.2 0 0 1 18 6.8Z"/>
+            </svg>
+          </a>
+          <a class="icon-link" href="https://www.facebook.com/halisabutchery" target="_blank" rel="noopener" aria-label="פייסבוק">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="currentColor" d="M13.5 22v-8h2.8l.4-3H13.5V9.1c0-.9.3-1.6 1.7-1.6h1.6V4.8c-.3 0-1.4-.1-2.6-.1-2.6 0-4.4 1.6-4.4 4.5V11H7v3h2.8v8h3.7Z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </footer>
   </div>
 
   <!-- כפתור סל צף -->
@@ -849,11 +928,42 @@
       if(next <= 0) cart.delete(k);
       else cart.get(k).qty = next;
 
+      // אנליטיקס – מה מוסיפים לסל (קטגוריות/מוצרים)
+      if(typeof gtag === 'function'){
+        gtag('event', 'add_to_cart', {
+          currency: 'ILS',
+          value: (Number(item.price)||0) * (Number(addQty)||0),
+          items: [{
+            item_name: item.name,
+            item_category: item.category,
+            price: Number(item.price)||0,
+            quantity: Number(addQty)||0,
+            item_variant: unitLabelOf(item)
+          }]
+        });
+      }
+
       renderCart();
       saveState();
     }
 
     function removeItem(item){
+      // אנליטיקס – הסרה מהסל
+      if(typeof gtag === 'function'){
+        const q = Number(item.qty)||0;
+        gtag('event', 'remove_from_cart', {
+          currency: 'ILS',
+          value: (Number(item.price)||0) * q,
+          items: [{
+            item_name: item.name,
+            item_category: item.category,
+            price: Number(item.price)||0,
+            quantity: q,
+            item_variant: unitLabelOf(item)
+          }]
+        });
+      }
+
       cart.delete(keyOf(item));
       renderCart();
       saveState();
@@ -983,10 +1093,25 @@
       waBtn.addEventListener('click', ()=>{
         if(!validateFulfillment()) return;
 
+        const url = WA_BASE + encodeURIComponent(buildText());
+
+        // נשאר אותו אירוע בדיוק (רק הוספת Beacon כדי שלא ייחתך)
         if(typeof gtag === 'function'){
-          gtag('event', 'click_wa_button', { event_category:'engagement', event_label:'WhatsApp Send Button' });
+          const cartValue = Array.from(cart.values()).reduce((s,it)=> s + (Number(it.price)||0) * (Number(it.qty)||0), 0);
+          const cats = Array.from(new Set(Array.from(cart.values()).map(it=>it.category))).join(',');
+          gtag('event', 'click_wa_button', {
+            event_category:'engagement',
+            event_label:'WhatsApp Send Button',
+            transport_type:'beacon',
+            currency:'ILS',
+            value: cartValue,
+            items_count: cart.size,
+            categories: cats
+          });
         }
-        window.open(WA_BASE + encodeURIComponent(buildText()), "_blank");
+
+        // דיליי קטן כדי להבטיח שהאירוע נשלח לפני פתיחת הטאב
+        setTimeout(()=> window.open(url, "_blank"), 120);
       });
     }
 
