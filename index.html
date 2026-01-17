@@ -5,6 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>קטלוג הזמנות בוואטסאפ - סניף חליסה</title>
 
+  <meta name="description" content="אטליז חליסה – הזמנה מהירה בוואטסאפ. בוחרים מוצרים, מוסיפים לסל ושולחים לקצב. איסוף עצמי או משלוח (לפי זמינות)." />
+  <meta name="theme-color" content="#ffffff" />
+
+  <!-- Open Graph -->
+  <meta property="og:locale" content="he_IL" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="קטלוג הזמנות בוואטסאפ – אטליז חליסה" />
+  <meta property="og:description" content="בוחרים מוצרים, מוסיפים לסל ושולחים בוואטסאפ. סניף חליסה – רח׳ הגיבורים 28, חיפה." />
+  <meta property="og:image" content="Asset 1.webp" />
+
   <!-- Google tag (gtag.js) – GA4 -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-LJ5QVNL81Q"></script>
   <script>
@@ -12,6 +22,76 @@
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
     gtag('config', 'G-LJ5QVNL81Q');
+  </script>
+
+  <!-- LocalBusiness Schema (Geo) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "אטליז חליסה",
+    "description": "אטליז שכונתי בחליסה – הזמנות בוואטסאפ לאיסוף עצמי או משלוח (לפי זמינות).",
+    "telephone": "+972549220234",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "רח׳ הגיבורים 28",
+      "addressLocality": "חיפה",
+      "addressCountry": "IL"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 32.8030133,
+      "longitude": 35.0080511
+    },
+    "openingHoursSpecification": [
+      {"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"opens":"09:00","closes":"18:00"}
+    ],
+    "hasMap": "https://www.google.com/maps/place/%D7%90%D7%98%D7%9C%D7%99%D7%96+%D7%97%D7%9C%D7%99%D7%A1%D7%94%E2%80%AD/@32.8030133,35.0080511,785m/data=!3m2!1e3!4b1!4m6!3m5!1s0x151dba5add0e820d:0x9ab7c1554f14df87!8m2!3d32.8030133!4d35.0080511!16s%2Fg%2F11hdpmd14v?entry=ttu&g_ep=EgoyMDI2MDExMy4wIKXMDSoASAFQAw%3D%3D",
+    "sameAs": [
+      "https://www.instagram.com/halisaa_butchery/",
+      "https://www.facebook.com/halisabutchery"
+    ]
+  }
+  </script>
+
+  <!-- FAQ Schema (AI/SEO) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "איזה נתח מומלץ לתנור?",
+        "acceptedAnswer": {"@type":"Answer","text":"לתנור ובישול ארוך בדרך כלל נמליץ על כתף מס׳ 5 / אוסובוקו / צוואר כבש / שוק כבש. כתבו בהערות מה אתם עושים ונכוון אתכם."}
+      },
+      {
+        "@type": "Question",
+        "name": "מה הכי מתאים לסטייק?",
+        "acceptedAnswer": {"@type":"Answer","text":"לסטייקים לרוב הולכים על אנטריקוט / טיבון / פיקנייה. רוצים משהו רך יותר או שומני יותר? כתבו לנו ונכוון."}
+      },
+      {
+        "@type": "Question",
+        "name": "אפשר לבקש חיתוך מיוחד?",
+        "acceptedAnswer": {"@type":"Answer","text":"כן. כתבו בהערות אם אתם רוצים קוביות/טחון/סטייקים/נתח שלם, ואיך אתם מבשלים."}
+      },
+      {
+        "@type": "Question",
+        "name": "איך מזמינים?",
+        "acceptedAnswer": {"@type":"Answer","text":"מוסיפים מוצרים לסל, בוחרים איסוף עצמי או משלוח (לפי זמינות), ולוחצים על שליחה ל־WhatsApp."}
+      },
+      {
+        "@type": "Question",
+        "name": "כמה זמן לוקח להכין הזמנה?",
+        "acceptedAnswer": {"@type":"Answer","text":"בדרך כלל אנחנו מכינים מהר, אבל בשעות עומס זה יכול לקחת יותר. אחרי שליחה בוואטסאפ נחזור אליכם כשמוכן."}
+      },
+      {
+        "@type": "Question",
+        "name": "איפה כדאי לקנות בשר?",
+        "acceptedAnswer": {"@type":"Answer","text":"הכי חשוב לקנות במקום שיש קצב שמכיר את הנתחים וחותך לפי הבישול שלכם. אצלנו בחליסה תקבלו התאמה לפי צורך, לא רק מוצר."}
+      }
+    ]
+  }
   </script>
 
   <style>
@@ -467,6 +547,42 @@
       100% { box-shadow:0 0 0 0 rgba(22,163,74,0), 0 2px 6px rgba(0,0,0,.08); }
     }
 
+    /* ===== FAQ עדין (לשאלות נפוצות) ===== */
+    .faq{
+      margin-top:14px;
+      background:var(--paper);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px;
+    }
+    .faq h3{margin:0 0 6px 0;font-size:15px}
+    .faq .mini{margin:0 0 10px 0}
+    .faq-item{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px;
+      margin-bottom:8px;
+    }
+    .faq-q{
+      width:100%;
+      text-align:right;
+      background:transparent;
+      border:0;
+      padding:0;
+      cursor:pointer;
+      color:var(--ink);
+      font-weight:900;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .faq-q span{font-weight:900}
+    .faq-q .chev{opacity:.6;font-weight:900}
+    .faq-a{margin-top:8px;color:var(--muted);font-size:13px;line-height:1.5;display:none}
+    .faq-item.is-open .faq-a{display:block}
+
     /* ===== פוטר עדין לסניף חליסה ===== */
     .site-footer{
       margin-top:16px;
@@ -588,11 +704,47 @@
       </aside>
     </div>
 
+    <!-- שאלות נפוצות (קצר וישר) -->
+    <section class="faq" aria-label="שאלות נפוצות">
+      <h3>שאלות נפוצות</h3>
+      <p class="mini">שאלות שחוזרות הרבה – אם לא מצאתם, כתבו לנו בהערות ונכוון אתכם.</p>
+
+      <div class="faq-item">
+        <button class="faq-q" type="button" aria-expanded="false"><span>איזה נתח מומלץ לתנור?</span><span class="chev">+</span></button>
+        <div class="faq-a">לתנור ובישול ארוך בדרך כלל נמליץ על <strong>כתף מס׳ 5</strong> / <strong>אוסובוקו</strong> / <strong>צוואר כבש</strong> / <strong>שוק כבש</strong>. כתבו בהערות מה אתם עושים ונכוון.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" type="button" aria-expanded="false"><span>מה הכי מתאים לסטייק?</span><span class="chev">+</span></button>
+        <div class="faq-a">לרוב הולכים על <strong>אנטריקוט</strong> / <strong>טיבון</strong> / <strong>פיקנייה</strong>. רוצים רך יותר או שומני יותר? כתבו ונכוון.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" type="button" aria-expanded="false"><span>אפשר לבקש חיתוך מיוחד?</span><span class="chev">+</span></button>
+        <div class="faq-a">כן. כתבו בהערות אם אתם רוצים קוביות/טחון/סטייקים/נתח שלם, וגם לאיזה בישול.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" type="button" aria-expanded="false"><span>איך מזמינים פה?</span><span class="chev">+</span></button>
+        <div class="faq-a">מוסיפים מוצרים לסל, בוחרים <strong>איסוף עצמי</strong> או <strong>משלוח</strong> (לפי זמינות), ולוחצים על <strong>שליחה ל־WhatsApp</strong>.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" type="button" aria-expanded="false"><span>כמה זמן לוקח להכין הזמנה?</span><span class="chev">+</span></button>
+        <div class="faq-a">בדרך כלל מהר, אבל בשעות עומס זה יכול לקחת יותר. אחרי שליחה בוואטסאפ נחזור אליכם כשמוכן.</div>
+      </div>
+
+      <div class="faq-item" style="margin-bottom:0;">
+        <button class="faq-q" type="button" aria-expanded="false"><span>איפה כדאי לקנות בשר?</span><span class="chev">+</span></button>
+        <div class="faq-a">הכי חשוב לקנות במקום שיש קצב שמכיר את הנתחים וחותך לפי הבישול שלכם. אצלנו בחליסה – התאמה לפי צורך, לא רק מוצר.</div>
+      </div>
+    </section>
+
     <!-- פוטר (חליסה בלבד) -->
     <footer class="site-footer" aria-label="פרטי סניף חליסה">
       <div class="footer-row">
         <!-- כתובת ראשונה + ניווט -->
-        <a class="footer-addr" href="https://www.google.com/maps/place/%D7%90%D7%98%D7%9C%D7%99%D7%96+%D7%97%D7%9C%D7%99%D7%A1%D7%94%E2%80%AD/@32.8030133,35.0080511,785m/data=!3m2!1e3!4b1!4m6!3m5!1s0x151dba5add0e820d:0x9ab7c1554f14df87!8m2!3d32.8030133!4d35.0080511!16s%2Fg%2F11hdpmd14v?entry=ttu&g_ep=EgoyMDI2MDExMy4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener">
+        <a class="footer-addr" id="dirLink" href="https://www.google.com/maps/place/%D7%90%D7%98%D7%9C%D7%99%D7%96+%D7%97%D7%9C%D7%99%D7%A1%D7%94%E2%80%AD/@32.8030133,35.0080511,785m/data=!3m2!1e3!4b1!4m6!3m5!1s0x151dba5add0e820d:0x9ab7c1554f14df87!8m2!3d32.8030133!4d35.0080511!16s%2Fg%2F11hdpmd14v?entry=ttu&g_ep=EgoyMDI2MDExMy4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener">
           <strong>כתובת:</strong>
           <span>רח׳ הגיבורים 28, חיפה (שכונת חליסה)</span>
         </a>
@@ -647,7 +799,7 @@
   </div>
 
   <script>
-    // וואטסאפ – חליסה (סניף שני)
+    // וואטסאפ – סניף חליסה
     const WA_BASE = "https://wa.me/972549220234?text=";
 
     const DATA = [
@@ -1443,6 +1595,43 @@
     });
 
     sortSel?.addEventListener('change', apply);
+
+    // ===== Analytics: ניווט למפות + FAQ =====
+    const dirLink = document.getElementById('dirLink');
+    if(dirLink){
+      dirLink.addEventListener('click', ()=>{
+        if(typeof gtag === 'function'){
+          gtag('event', 'click_directions', {
+            event_category: 'engagement',
+            event_label: 'Google Maps Directions',
+            transport_type: 'beacon'
+          });
+        }
+      });
+    }
+
+    const faqItems = Array.from(document.querySelectorAll('.faq-item'));
+    faqItems.forEach((it, idx)=>{
+      const btn = it.querySelector('.faq-q');
+      const ans = it.querySelector('.faq-a');
+      if(!btn || !ans) return;
+
+      btn.addEventListener('click', ()=>{
+        const isOpen = it.classList.toggle('is-open');
+        btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        const chev = btn.querySelector('.chev');
+        if(chev) chev.textContent = isOpen ? '−' : '+';
+
+        if(isOpen && typeof gtag === 'function'){
+          const qTxt = (btn.textContent || '').replace(/[\+\-]/g,'').trim();
+          gtag('event', 'faq_open', {
+            event_category: 'engagement',
+            event_label: qTxt || `FAQ ${idx+1}`,
+            transport_type: 'beacon'
+          });
+        }
+      });
+    });
 
     // Smoke tests
     (function runSmokeTests(){
